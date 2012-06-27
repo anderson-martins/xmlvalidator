@@ -1,9 +1,14 @@
+import java.awt.Dimension;
+import java.awt.ScrollPane;
 import java.io.IOException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
 
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -20,7 +25,12 @@ public class TabelaXML extends AbstractTableModel{
 	NodeList linhas;
 	Element columnSection;
 	Element rowSection;
+	JTable table;
+	JScrollPane scrollpane;
+	String nomeTabela;
+	
 	public TabelaXML(String documentoXml) throws IOException, ParserConfigurationException, org.xml.sax.SAXException{
+		this.nomeTabela = documentoXml;
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setIgnoringComments(true);
 		factory.setNamespaceAware(false);
@@ -32,9 +42,25 @@ public class TabelaXML extends AbstractTableModel{
 		
 		colunas = tabela.getElementsByTagName("FIELD");
 		linhas = tabela.getElementsByTagName("ROW");
+		
+		table = new JTable();
+		table.setModel(this);
+		scrollpane = new JScrollPane(table);
+		
+		
 				
 	}
-
+	public String getNomeTabela(){
+		return this.nomeTabela;
+	}
+	public void setPanelSize(int width, int height){
+		scrollpane.setPreferredSize(new Dimension(width,height));
+	}
+	public JScrollPane getPanel(){
+		return this.scrollpane;
+	}
+	
+	//metodos necessários para montagem da tabela, usados internamente quando usado o metodo JTabel.seTModel()
 	@Override
 	public int getColumnCount() {
 		return colunas.getLength();
@@ -57,7 +83,7 @@ public class TabelaXML extends AbstractTableModel{
 	}
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex){
-		return true;
+		return true; // permiti editar celulas
 	}
 	
 	

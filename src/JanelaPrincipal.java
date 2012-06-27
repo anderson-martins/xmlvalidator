@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -23,6 +24,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -37,19 +39,22 @@ import javax.swing.border.EmptyBorder;
 public class JanelaPrincipal extends JFrame {
 	private static ResourceBundle resources;
 	
+	//gui components
+	private Container content = getContentPane();
+	private JMenuBar menuBar = new JMenuBar();
+	private JToolBar toolBar = new JToolBar();
+	private JPanel propriedades = new JPanel();
+	private URL url;
+	private JTabbedPane abas;
+	private TabelaXML tabela;
+	final private int PROPORCAO_TELA = 6;
+	
 	public  void createWindow(){
-		
-		//gui components
-		Container content = getContentPane();
-		JMenuBar menuBar = new JMenuBar();
-		JToolBar toolBar = new JToolBar();
-		JPanel propriedades = new JPanel();
-		JPanel areaTabelas = new JPanel();
-				
+						
 		GraphicsEnvironment localGE = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		Rectangle center = localGE.getMaximumWindowBounds(); // tamanho maximo
 		
-		URL url = null;
+		url = null;
 		setBounds(center);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
@@ -120,22 +125,36 @@ public class JanelaPrincipal extends JFrame {
 		toolBar.add(btValida);
 		
 		//status
-		JLabel statusBar = new JLabel("Status");
+		JLabel statusBar = new JLabel("Validação de arquivos XML");
 		statusBar.setBorder(new EmptyBorder(4,4,4,4));
 		statusBar.setHorizontalAlignment(JLabel.LEADING);
 
 		// JPanel propriedades
-		propriedades.setMinimumSize(new Dimension(content.getWidth()/6,content.getHeight()/6));
+		propriedades.setMinimumSize(new Dimension(content.getWidth()/PROPORCAO_TELA,content.getHeight()/PROPORCAO_TELA));
 		JLabel lbPropriedades = new JLabel("Arquivos");
 		lbPropriedades.setHorizontalAlignment(JLabel.LEADING);
 		propriedades.add(lbPropriedades,BorderLayout.NORTH);
 				
-		// JPanel areaTalbelas
-		areaTabelas.setMinimumSize(new Dimension((content.getWidth()/4)*3,content.getHeight()/2));
+		// areadas talbelas
+		//sera implementado na classe OpenAction
+		try {
+			tabela = new TabelaXML("PARTICIPANTE_PROC_LICIT_CERTID.xml");
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+		}
+		abas = new JTabbedPane(JTabbedPane.TOP);
+		abas.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+		//abas.setLayout(new BorderLayout());
+		JPanel painel1 = new JPanel();
+		painel1.setLayout(new BorderLayout());
+		abas.add(tabela.getNomeTabela(), painel1);
+		initTabComponent(0);
+		abas.add(new JPanel());
+		tabela.setPanelSize((content.getWidth()/6) * 4, content.getHeight()-120);
+		painel1.add(tabela.getPanel());
 		
 		
-		
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, propriedades, areaTabelas);
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, propriedades, abas);
 		
 		// add
 		content.setLayout(new BorderLayout());
@@ -154,7 +173,8 @@ public class JanelaPrincipal extends JFrame {
 			}catch (Exception ex) {
 				System.err.println("Look And Feel nao encontrado!");
 			}
-		}		
+		}
+		
 	}
 	public static boolean usingNimbus() {
 		return UIManager.getLookAndFeel().getName().equals("Nimbus");	
@@ -177,6 +197,11 @@ public class JanelaPrincipal extends JFrame {
 		}
 		return str;
 	}
+	 //implementado pela oracle ButtonTabComponent
+	 protected void initTabComponent(int i) {
+	        abas.setTabComponentAt(i,
+	                 new ButtonTabComponent(abas));	    
+	 }
 
 	/**
 	 * @param args
