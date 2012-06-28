@@ -1,15 +1,16 @@
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.ScrollPane;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -30,25 +31,28 @@ public class TabelaXML extends AbstractTableModel{
 	Element rowSection;
 	JTable table;
 	JScrollPane scrollpane;
-	String nomeTabela="";
+	File arquivoTabela;
 	Document tabela;
 	
 	public TabelaXML(String documentoXml) throws IOException, ParserConfigurationException, org.xml.sax.SAXException{
-		this.nomeTabela = documentoXml;
+		this.arquivoTabela = new File(documentoXml);
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setIgnoringComments(true);
 		factory.setNamespaceAware(false);
 		factory.setValidating(false);
-		System.out.println(documentoXml);
+		
 		DocumentBuilder parser = factory.newDocumentBuilder();
 		
-		tabela = parser.parse(documentoXml);
+		//tabela = parser.parse(documentoXml); //encoding="ISO-8859-1"
+		InputStream is = new BufferedInputStream(new FileInputStream(arquivoTabela));
+		tabela = parser.parse(new InputSource(new InputStreamReader(is, "ISO-8859-1"))); //gambiarra suprema para ler em um charset diferente da utf-8 que tava dando pau em algumas XML 
 		
 		colunas = tabela.getElementsByTagName("FIELD");
 		linhas = tabela.getElementsByTagName("ROW");
 		
 		table = new JTable();
 		table.setModel(this);
+		table.setAutoCreateRowSorter(true);
 		scrollpane = new JScrollPane(table);
 		
 		

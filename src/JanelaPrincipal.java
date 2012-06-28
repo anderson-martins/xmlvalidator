@@ -74,10 +74,22 @@ public class JanelaPrincipal extends JFrame {
 		//arquivo
 		JMenu menuArquivo = new JMenu("Arquivo");
 		JMenuItem menuArquivoNovo = new JMenuItem("Novo");
+		
 		JMenuItem menuArquivoAbrir = new JMenuItem("Abrir");
 		menuArquivoAbrir.addActionListener(new OpenAction());
+		
 		JMenuItem menuArquivoSalvar = new JMenuItem("Salvar");
+		
 		JMenuItem menuArquivoSair = new JMenuItem("Sair");
+		menuArquivoSair.addActionListener(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				System.exit(0);
+				
+			}
+		});
+		
 		menuArquivo.add(menuArquivoNovo);
 		menuArquivo.add(menuArquivoAbrir);
 		menuArquivo.add(menuArquivoSalvar);
