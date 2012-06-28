@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.ScrollPane;
+import java.io.File;
 import java.io.IOException;
 
 import org.w3c.dom.Document;
@@ -29,7 +30,8 @@ public class TabelaXML extends AbstractTableModel{
 	Element rowSection;
 	JTable table;
 	JScrollPane scrollpane;
-	String nomeTabela;
+	String nomeTabela="";
+	Document tabela;
 	
 	public TabelaXML(String documentoXml) throws IOException, ParserConfigurationException, org.xml.sax.SAXException{
 		this.nomeTabela = documentoXml;
@@ -37,10 +39,10 @@ public class TabelaXML extends AbstractTableModel{
 		factory.setIgnoringComments(true);
 		factory.setNamespaceAware(false);
 		factory.setValidating(false);
-		
+		System.out.println(documentoXml);
 		DocumentBuilder parser = factory.newDocumentBuilder();
 		
-		Document tabela = parser.parse(documentoXml);
+		tabela = parser.parse(documentoXml);
 		
 		colunas = tabela.getElementsByTagName("FIELD");
 		linhas = tabela.getElementsByTagName("ROW");
@@ -52,9 +54,8 @@ public class TabelaXML extends AbstractTableModel{
 		
 				
 	}
-	public String getNomeTabela(){
-		return this.nomeTabela;
-	}
+	
+	
 	public void setPanelSize(int width, int height){
 		scrollpane.setPreferredSize(new Dimension(width,height));
 	}

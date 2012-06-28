@@ -22,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -47,7 +48,8 @@ public class JanelaPrincipal extends JFrame {
 	private URL url;
 	private JTabbedPane abas;
 	private TabelaXML tabela;
-	final private int PROPORCAO_TELA = 6;
+	final private int PROPORCAO_TELA = 7;
+	JPanel painelAbas;
 	
 	public  void createWindow(){
 						
@@ -135,22 +137,11 @@ public class JanelaPrincipal extends JFrame {
 		lbPropriedades.setHorizontalAlignment(JLabel.LEADING);
 		propriedades.add(lbPropriedades,BorderLayout.NORTH);
 				
-		// areadas talbelas
-		//sera implementado na classe OpenAction
-		try {
-			tabela = new TabelaXML("PARTICIPANTE_PROC_LICIT_CERTID.xml");
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-		}
+		// areadas talbelas		
 		abas = new JTabbedPane(JTabbedPane.TOP);
 		abas.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-		JPanel painel1 = new JPanel();
-		painel1.setLayout(new BorderLayout());
-		abas.add(tabela.getNomeTabela(), painel1);
-		initTabComponent(0);
-		abas.add(new JPanel());
-		//tabela.setPanelSize((content.getWidth()/6) * 4, content.getHeight()-120);
-		painel1.add(tabela.getPanel());
+		
+		
 		
 		
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, propriedades, abas);
@@ -219,16 +210,16 @@ public class JanelaPrincipal extends JFrame {
 
 	}
 	class OpenAction extends AbstractAction {
-		ExtensionFilter extensionFilter = new ExtensionFilter("xml", "Arquivos XML");
+		ExtensionFilter extensionFilter = new ExtensionFilter("xml", "Arquivos XML (Tabela APLIC)");
 		OpenAction() {
 		    super("abrir");
 		}
 
 	        public void actionPerformed(ActionEvent e) {
 		    
-	            JFileChooser chooser = new JFileChooser();
+	            JFileChooser chooser = new JFileChooser("c:/aplic");
 	            chooser.addChoosableFileFilter(extensionFilter);
-	            chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+	            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	            chooser.setFileFilter(extensionFilter);
 	            chooser.rescanCurrentDirectory();
 	            
@@ -239,23 +230,31 @@ public class JanelaPrincipal extends JFrame {
 		    }
 
 	            File f = chooser.getSelectedFile();
-		    /*if (f.isFile() && f.canRead()) {
-			Document oldDoc = getEditor().getDocument();
-			if(oldDoc != null)
-			    oldDoc.removeUndoableEditListener(undoHandler);
-			if (elementTreePanel != null) {
-			    elementTreePanel.setEditor(null);
-			}
-			getEditor().setDocument(new PlainDocument());
-	                frame.setTitle(f.getName());
-			Thread loader = new FileLoader(f, editor.getDocument());
-			loader.start();
+		    if (f.isFile() && f.canRead() && f.getName().toLowerCase().endsWith("xml")) {
+		    	
+		    	try {
+					tabela = new TabelaXML(f.getAbsolutePath());
+				} catch (Exception ex) {
+					System.err.println(ex.getMessage());
+				}
+		    	painelAbas = new JPanel();
+				painelAbas.setMinimumSize(new Dimension((content.getWidth()/PROPORCAO_TELA )*4,content.getHeight()/PROPORCAO_TELA));
+				painelAbas.setLayout(new BorderLayout());
+				
+				abas.add(f.getName(), painelAbas);
+				
+				painelAbas.add(tabela.getPanel());
+		    	
+				initTabComponent(abas.getTabCount()-1); //insere botao fechar na aba
+				abas.setSelectedIndex(abas.getTabCount()-1); // seleciona a aba criada
+		    	
+			
 		    } else {
 	                JOptionPane.showMessageDialog(getContentPane(),
-	                        "Could not open file: " + f,
-	                        "Error opening file",
+	                        "Não foi possível abrir a tabela XML ou não é um documento válido: " + f,
+	                        "Erro ao abrir arquivo",
 	                        JOptionPane.ERROR_MESSAGE);
-		    }*/
+		    }
 		}
 	    }
 
