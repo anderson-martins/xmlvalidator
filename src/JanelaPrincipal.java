@@ -144,13 +144,12 @@ public class JanelaPrincipal extends JFrame {
 		}
 		abas = new JTabbedPane(JTabbedPane.TOP);
 		abas.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-		//abas.setLayout(new BorderLayout());
 		JPanel painel1 = new JPanel();
 		painel1.setLayout(new BorderLayout());
 		abas.add(tabela.getNomeTabela(), painel1);
 		initTabComponent(0);
 		abas.add(new JPanel());
-		tabela.setPanelSize((content.getWidth()/6) * 4, content.getHeight()-120);
+		//tabela.setPanelSize((content.getWidth()/6) * 4, content.getHeight()-120);
 		painel1.add(tabela.getPanel());
 		
 		
