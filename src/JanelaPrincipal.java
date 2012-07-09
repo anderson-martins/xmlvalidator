@@ -1,11 +1,12 @@
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -31,6 +32,13 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 
 
@@ -50,6 +58,7 @@ public class JanelaPrincipal extends JFrame {
 	private TabelaXML tabela;
 	final private int PROPORCAO_TELA = 7;
 	JPanel painelAbas;
+	protected boolean alterado;
 	
 	public  void createWindow(){
 						
@@ -79,6 +88,7 @@ public class JanelaPrincipal extends JFrame {
 		menuArquivoAbrir.addActionListener(new OpenAction());
 		
 		JMenuItem menuArquivoSalvar = new JMenuItem("Salvar");
+		menuArquivoSalvar.addActionListener(new SaveAction());
 		
 		JMenuItem menuArquivoSair = new JMenuItem("Sair");
 		menuArquivoSair.addActionListener(new AbstractAction() {
@@ -178,6 +188,22 @@ public class JanelaPrincipal extends JFrame {
 		}
 		
 	}
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(new Runnable(){
+			public void run(){
+				new JanelaPrincipal().createWindow();
+			}
+		});
+		UIManager.LookAndFeelInfo[] looks = UIManager.getInstalledLookAndFeels();
+		for(UIManager.LookAndFeelInfo look : looks){
+			System.out.println(look.getClassName());
+		}
+		
+
+	}
 	public static boolean usingNimbus() {
 		return UIManager.getLookAndFeel().getName().equals("Nimbus");	
 	}
@@ -205,22 +231,7 @@ public class JanelaPrincipal extends JFrame {
 	                 new ButtonTabComponent(abas));	    
 	 }
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new Runnable(){
-			public void run(){
-				new JanelaPrincipal().createWindow();
-			}
-		});
-		UIManager.LookAndFeelInfo[] looks = UIManager.getInstalledLookAndFeels();
-		for(UIManager.LookAndFeelInfo look : looks){
-			System.out.println(look.getClassName());
-		}
-		
 
-	}
 	class OpenAction extends AbstractAction {
 		ExtensionFilter extensionFilter = new ExtensionFilter("xml", "Arquivos XML (Tabela APLIC)");
 		OpenAction() {
@@ -229,7 +240,7 @@ public class JanelaPrincipal extends JFrame {
 
 	        public void actionPerformed(ActionEvent e) {
 		    
-	            JFileChooser chooser = new JFileChooser("c:/aplic");
+	            JFileChooser chooser = new JFileChooser("c:/aplic"); //se nao abrir nesse diretorio abrirá no default
 	            chooser.addChoosableFileFilter(extensionFilter);
 	            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	            chooser.setFileFilter(extensionFilter);
@@ -257,8 +268,14 @@ public class JanelaPrincipal extends JFrame {
 				
 				painelAbas.add(tabela.getPanel());
 		    	
+				alterado = false;
+				
 				initTabComponent(abas.getTabCount()-1); //insere botao fechar na aba
 				abas.setSelectedIndex(abas.getTabCount()-1); // seleciona a aba criada
+		    	tabela.addTableModelListener(new EditTabela());
+		    	System.out.println("indice: "+ abas.getSelectedIndex());
+		    	System.out.println("total indice "+ abas.getTabCount());
+		    	
 		    	
 			
 		    } else {
@@ -266,8 +283,42 @@ public class JanelaPrincipal extends JFrame {
 	                        "Não foi possível abrir a tabela XML ou não é um documento válido: " + f,
 	                        "Erro ao abrir arquivo",
 	                        JOptionPane.ERROR_MESSAGE);
+		    
 		    }
-		}
+	        }
 	    }
+	class EditTabela implements TableModelListener{
+		
+
+		
+		public void tableChanged(TableModelEvent ev) {
+			//if (ev.getType() == TableModelEvent.UPDATE){
+				abas.setTitleAt(abas.getSelectedIndex(), "*"+abas.getTitleAt(abas.getSelectedIndex()));
+				alterado = true;
+			//}
+			
+		}
+
+		
+	}
+	class SaveAction extends AbstractAction{
+		public void actionPerformed(ActionEvent e){
+			try{
+				DOMSource source = new DOMSource(tabela.getDocument());
+				StreamResult result = new StreamResult(new FileOutputStream(tabela.getArquivo()));
+				TransformerFactory transFactory = TransformerFactory.newInstance();
+				Transformer transformer = transFactory.newTransformer();
+				transformer.transform(source, result);
+				System.out.println(tabela.getArquivo());
+			
+			}catch (Exception ex) {
+				JOptionPane.showMessageDialog(getContentPane(),
+                        "Não foi possível salvar a tabela XML: "+tabela.getArquivo(),
+                        "Erro ao abrir arquivo",
+                        JOptionPane.ERROR_MESSAGE);
+			}
+			
+		}
+	}
 
 }

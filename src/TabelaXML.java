@@ -66,6 +66,12 @@ public class TabelaXML extends AbstractTableModel{
 	public JScrollPane getPanel(){
 		return this.scrollpane;
 	}
+	public File getArquivo(){
+		return this.arquivoTabela;
+	}
+	public Document getDocument(){
+		return this.tabela;
+	}
 	
 	//metodos necessários para montagem da tabela, usados internamente quando usado o metodo JTabel.seTModel()
 	@Override
@@ -91,6 +97,14 @@ public class TabelaXML extends AbstractTableModel{
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex){
 		return true; // permiti editar celulas
+	}
+	@Override
+	public void setValueAt(Object valor, int row, int column){
+		rowSection = (Element) linhas.item(row);
+		System.out.println("linha "+row +" coluna: "+column +" valor: "+valor);
+		rowSection.setAttribute(getColumnName(column),(String) valor);
+		System.out.println(getValueAt(row, column));
+		fireTableCellUpdated(row, column); //avisa o listener
 	}
 	
 	
