@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Hashtable;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -59,12 +60,14 @@ public class JanelaPrincipal extends JFrame {
 	final private int PROPORCAO_TELA = 7;
 	JPanel painelAbas;
 	protected boolean alterado;
+	protected Hashtable<String, TabelaXML> hTabelas;
 	
 	public  void createWindow(){
 						
 		GraphicsEnvironment localGE = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		Rectangle center = localGE.getMaximumWindowBounds(); // tamanho maximo
 		
+		hTabelas = new Hashtable<String, TabelaXML>();
 		url = null;
 		setBounds(center);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -197,10 +200,10 @@ public class JanelaPrincipal extends JFrame {
 				new JanelaPrincipal().createWindow();
 			}
 		});
-		UIManager.LookAndFeelInfo[] looks = UIManager.getInstalledLookAndFeels();
+		/*UIManager.LookAndFeelInfo[] looks = UIManager.getInstalledLookAndFeels();
 		for(UIManager.LookAndFeelInfo look : looks){
 			System.out.println(look.getClassName());
-		}
+		}*/
 		
 
 	}
@@ -273,10 +276,8 @@ public class JanelaPrincipal extends JFrame {
 				initTabComponent(abas.getTabCount()-1); //insere botao fechar na aba
 				abas.setSelectedIndex(abas.getTabCount()-1); // seleciona a aba criada
 		    	tabela.addTableModelListener(new EditTabela());
-		    	System.out.println("indice: "+ abas.getSelectedIndex());
-		    	System.out.println("total indice "+ abas.getTabCount());
-		    	
-		    	
+		    			    			    	
+		    	hTabelas.put(f.getName(), tabela);
 			
 		    } else {
 	                JOptionPane.showMessageDialog(getContentPane(),
@@ -292,10 +293,10 @@ public class JanelaPrincipal extends JFrame {
 
 		
 		public void tableChanged(TableModelEvent ev) {
-			//if (ev.getType() == TableModelEvent.UPDATE){
+			if (!alterado){
 				abas.setTitleAt(abas.getSelectedIndex(), "*"+abas.getTitleAt(abas.getSelectedIndex()));
 				alterado = true;
-			//}
+			}
 			
 		}
 
@@ -303,19 +304,25 @@ public class JanelaPrincipal extends JFrame {
 	}
 	class SaveAction extends AbstractAction{
 		public void actionPerformed(ActionEvent e){
+			
+			if(alterado){
+				abas.setTitleAt(abas.getSelectedIndex(), abas.getTitleAt(abas.getSelectedIndex()).replace("*", ""));
+				alterado = false;
+			}
+			TabelaXML t = hTabelas.get(abas.getTitleAt(abas.getSelectedIndex()));
+			
 			try{
-				DOMSource source = new DOMSource(tabela.getDocument());
-				StreamResult result = new StreamResult(new FileOutputStream(tabela.getArquivo()));
+				DOMSource source = new DOMSource(t.getDocument());
+				StreamResult result = new StreamResult(new FileOutputStream(t.getArquivo()));
 				TransformerFactory transFactory = TransformerFactory.newInstance();
 				Transformer transformer = transFactory.newTransformer();
-				transformer.transform(source, result);
-				System.out.println(tabela.getArquivo());
-			
+				transformer.transform(source, result);			
 			}catch (Exception ex) {
 				JOptionPane.showMessageDialog(getContentPane(),
-                        "Não foi possível salvar a tabela XML: "+tabela.getArquivo(),
+                        "Não foi possível salvar a tabela XML: "+t.getArquivo(),
                         "Erro ao abrir arquivo",
                         JOptionPane.ERROR_MESSAGE);
+			
 			}
 			
 		}

@@ -100,10 +100,8 @@ public class TabelaXML extends AbstractTableModel{
 	}
 	@Override
 	public void setValueAt(Object valor, int row, int column){
-		rowSection = (Element) linhas.item(row);
-		System.out.println("linha "+row +" coluna: "+column +" valor: "+valor);
+		rowSection = (Element) linhas.item(row);	
 		rowSection.setAttribute(getColumnName(column),(String) valor);
-		System.out.println(getValueAt(row, column));
 		fireTableCellUpdated(row, column); //avisa o listener
 	}
 	
