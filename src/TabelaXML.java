@@ -1,3 +1,4 @@
+import java.awt.Component;
 import java.awt.Dimension;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -14,6 +15,9 @@ import org.xml.sax.InputSource;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.TableCellRenderer;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,7 +47,7 @@ public class TabelaXML extends AbstractTableModel{
 		
 		DocumentBuilder parser = factory.newDocumentBuilder();
 		
-		//tabela = parser.parse(documentoXml); //encoding="ISO-8859-1"
+		
 		InputStream is = new BufferedInputStream(new FileInputStream(arquivoTabela));
 		tabela = parser.parse(new InputSource(new InputStreamReader(is, "ISO-8859-1"))); //gambiarra suprema para ler em um charset diferente da utf-8 que tava dando pau em algumas XML 
 		
@@ -53,8 +57,9 @@ public class TabelaXML extends AbstractTableModel{
 		table = new JTable();
 		table.setModel(this);
 		table.setAutoCreateRowSorter(true);
-		scrollpane = new JScrollPane(table);
-		
+		scrollpane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		setLarguraMaximaColuna();
 		
 				
 	}
@@ -103,6 +108,42 @@ public class TabelaXML extends AbstractTableModel{
 		rowSection = (Element) linhas.item(row);	
 		rowSection.setAttribute(getColumnName(column),(String) valor);
 		fireTableCellUpdated(row, column); //avisa o listener
+	}
+	
+	public void setLarguraMaximaColuna(){
+        //Ajusta largura das colunas
+        DefaultTableColumnModel colModel = (DefaultTableColumnModel) table.getColumnModel();
+        DefaultTableCellRenderer dtcr;
+        for (int c = 0; c < table.getColumnCount(); c++) {
+            int width = 0;
+
+            // Obtém a largura do cabeçalho da coluna
+            TableCellRenderer renderer = colModel.getColumn(c).getHeaderRenderer();
+            if (renderer == null) {
+                renderer = table.getTableHeader().getDefaultRenderer();
+            }
+            Component comp = renderer.getTableCellRendererComponent(table, colModel.getColumn(c).getHeaderValue(), false, false, 0, 0);
+            width = comp.getPreferredSize().width;
+
+            // Obtém a largura máxima da coluna de dados
+            for (int r = 0; r < table.getRowCount(); r++) {
+                renderer = table.getCellRenderer(r, c);
+                comp = renderer.getTableCellRendererComponent(table, table.getValueAt(r, c), false, false, r, c);
+                width = Math.max(width, comp.getPreferredSize().width);
+                
+                if (r == 1) {
+                    //Alinha conteúdo da célula
+                     dtcr = new DefaultTableCellRenderer();
+                     //colModel.getColumn(c).setCellRenderer(ViewDataFormatAlign((table.getModel()).getValueAt(r, c), dtcr));
+                }
+            }
+
+            width += 2 * 2;
+
+            // Configura a largura
+            colModel.getColumn(c).setPreferredWidth(width);
+        }
+
 	}
 	
 	

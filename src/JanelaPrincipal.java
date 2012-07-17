@@ -147,8 +147,18 @@ public class JanelaPrincipal extends JFrame {
 		
 		//********************************* fim menu ************************************
 				
-		//janela
-		JButton btValida = new JButton(new ImageIcon(url));
+		
+		JButton newFile = new JButton(new ImageIcon(getResource("newImage")));
+		JButton openFile = new JButton(new ImageIcon(getResource("openImage")));
+		openFile.addActionListener(new OpenAction());
+		JButton saveFile = new JButton(new ImageIcon(getResource("saveImage")));
+		saveFile.addActionListener(new SaveAction());
+		JButton btValida = new JButton(new ImageIcon(getResource("validarImage")));
+		
+		toolBar.add(newFile);
+		toolBar.add(openFile);
+		toolBar.add(saveFile);
+		toolBar.addSeparator();
 		toolBar.add(btValida);
 		
 		//status
