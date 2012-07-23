@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.io.BufferedInputStream;
@@ -12,6 +13,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -29,6 +31,8 @@ public class TabelaXML extends AbstractTableModel{
 	 * 
 	 */
 	private static final long serialVersionUID = -1684081279215472578L;
+	public static final boolean APPROVED = true;
+	public static final boolean REJECTED = false;
 	NodeList colunas;
 	NodeList linhas;
 	Element columnSection;
@@ -60,8 +64,8 @@ public class TabelaXML extends AbstractTableModel{
 		scrollpane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		setLarguraMaximaColuna();
-		
-				
+		table.getColumnModel().getColumn(1).setCellRenderer(new StatusColumnCellRenderer());
+			
 	}
 	
 	
@@ -113,7 +117,7 @@ public class TabelaXML extends AbstractTableModel{
 	public void setLarguraMaximaColuna(){
         //Ajusta largura das colunas
         DefaultTableColumnModel colModel = (DefaultTableColumnModel) table.getColumnModel();
-        DefaultTableCellRenderer dtcr;
+        //DefaultTableCellRenderer dtcr;
         for (int c = 0; c < table.getColumnCount(); c++) {
             int width = 0;
 
@@ -133,7 +137,7 @@ public class TabelaXML extends AbstractTableModel{
                 
                 if (r == 1) {
                     //Alinha conteúdo da célula
-                     dtcr = new DefaultTableCellRenderer();
+                     //dtcr = new DefaultTableCellRenderer();
                      //colModel.getColumn(c).setCellRenderer(ViewDataFormatAlign((table.getModel()).getValueAt(r, c), dtcr));
                 }
             }
@@ -144,6 +148,50 @@ public class TabelaXML extends AbstractTableModel{
             colModel.getColumn(c).setPreferredWidth(width);
         }
 
+	}
+	// TODO: implementar validacao de campos
+	public boolean getStatus(int row, int column){
+		if (getValueAt(row, column).toString().length() != 2)
+			return REJECTED;
+		return APPROVED;
+	}
+	
+	/*public void celulaVermelha(int row, int column){
+		TableCellRenderer tcr = table.getCellRenderer(row, column);
+		Component cell = tcr.getTableCellRendererComponent(table, table.getValueAt(row, column), false, false, row, column);
+		cell.setBackground(Color.RED);
+		
+		
+	}*/
+	
+	@SuppressWarnings("serial")
+	public class StatusColumnCellRenderer extends DefaultTableCellRenderer {
+		  @Override
+		  public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+
+		    //Cells are by default rendered as a JLabel.
+		    JLabel l = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+		    //Get the status for the current row.
+		    TabelaXML tableModel = (TabelaXML) table.getModel();
+		    if(isSelected && tableModel.getStatus(row, col) == TabelaXML.APPROVED){
+		    	l.setBackground(new Color(0,100,160));
+		    }
+		    else if (tableModel.getStatus(row, col) == TabelaXML.REJECTED) {
+		      l.setBackground(Color.RED);
+		    } else {
+		    	if(row%2 == 0){
+		    		l.setBackground(new Color(242,242,242));
+		    	} else{
+		    		l.setBackground(Color.WHITE);
+		    	}
+		      
+		    }
+
+		  //Return the JLabel which renders the cell.
+		  return l;
+
+		}
+	
 	}
 	
 	

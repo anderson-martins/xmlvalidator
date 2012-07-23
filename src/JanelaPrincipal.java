@@ -6,7 +6,6 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.Locale;
@@ -36,7 +35,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -78,7 +76,7 @@ public class JanelaPrincipal extends JFrame {
 		try {
 			resources = ResourceBundle.getBundle("resources.JanelaPrincipal",Locale.getDefault());
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			System.err.println("erro - Resource "+e.getMessage());
 		}
 		setTitle("Validador XML");
 		
@@ -271,7 +269,7 @@ public class JanelaPrincipal extends JFrame {
 		    	try {
 					tabela = new TabelaXML(f.getAbsolutePath());
 				} catch (Exception ex) {
-					System.err.println(ex.getMessage());
+					System.err.println("Erro - abrir arquivo " +ex.getMessage());
 				}
 		    	painelAbas = new JPanel();
 				painelAbas.setMinimumSize(new Dimension((content.getWidth()/PROPORCAO_TELA )*4,content.getHeight()/PROPORCAO_TELA));
