@@ -44,7 +44,7 @@ public class DaoCampos {
             temp.setNome(rs.getString("nome"));  
             temp.setChave(rs.getBoolean("chave"));  
             temp.setComentario(rs.getString("comentario"));
-            temp.setObrigatorio(rs.getBoolean("obrigatorio"));
+            temp.setObrigatorio(rs.getString("obrigatorio"));
             temp.setTabelaOrigem(rs.getString("tabela_origem"));
             temp.setTamanho(rs.getInt("tamanho"));
             temp.setTamanho_fixo(rs.getBoolean("tamanho_fixo"));
@@ -64,13 +64,13 @@ public class DaoCampos {
       conectar();  
       String com = "UPDATE campos SET nome = '" + campos.getNome()  
             + "', tamanho =" + campos.getTamanho()  
-            + "', tamanho_fixo =" + campos.isTamanho_fixo()
-            + "', obrigatorio =" + campos.isObrigatorio()
-            + "', id_tabela =" + campos.getId_tabela()
-            + "', tabela_origem =" + campos.getTabelaOrigem()
+            + ", tamanho_fixo =" + campos.isTamanho_fixo()
+            + ", obrigatorio =" + campos.isObrigatorio()
+            + ", id_tabela =" + campos.getId_tabela()
+            + ", tabela_origem ='" + campos.getTabelaOrigem()
             + "', chave =" + campos.isChave()
-            + "', tipo =" + campos.getTipo()
-            + "', comentario =" + campos.getComentario()
+            + ", tipo ='" + campos.getTipo()
+            + "', comentario ='" + campos.getComentario()
             + "' WHERE  id_campo = '" + campos.getId_campo() + "';";  
       System.out.println("Atualizado id: "+campos.getId_campo());  
       try {  
@@ -82,31 +82,32 @@ public class DaoCampos {
       }  
    }  
   
-   public Vector<Campos> buscar(String nome, String id_tabela) {  
+   public Campos buscar(String nome, int id_tabela) {  
       conectar();  
-      Vector<Campos> resultados = new Vector<Campos>();  
+     
       ResultSet rs;  
       try {  
+    	 
          rs = comando.executeQuery("SELECT * FROM campos WHERE nome = '"  
-               + nome + "' AND id_tabela = '"+id_tabela+"';");  
-         while (rs.next()) {  
-            Campos temp = new Campos();  
-
-            temp.setId_campo(rs.getInt("id_campo"));
+               + nome + "' AND id_tabela = "+id_tabela+";");          
+         if(rs.first()){
+        	Campos temp = new Campos();  
+        	temp.setId_campo(rs.getInt("id_campo"));
             temp.setId_tabela(rs.getInt("id_tabela"));  
             temp.setNome(rs.getString("nome"));  
             temp.setChave(rs.getBoolean("chave"));  
             temp.setComentario(rs.getString("comentario"));
-            temp.setObrigatorio(rs.getBoolean("obrigatorio"));
+            temp.setObrigatorio(rs.getString("obrigatorio"));
             temp.setTabelaOrigem(rs.getString("tabela_origem"));
             temp.setTamanho(rs.getInt("tamanho"));
             temp.setTamanho_fixo(rs.getBoolean("tamanho_fixo"));
             temp.setTipo(rs.getString("tipo"));
-            
-         }  
-         return resultados;  
+            fechar();
+            return temp;  
+         }
+         return null;
       } catch (SQLException e) {  
-         imprimeErro("Erro ao buscar tabela", e.getMessage());  
+         imprimeErro("Erro ao buscar campo", e.getMessage());  
          return null;  
       }  
   
@@ -116,15 +117,15 @@ public class DaoCampos {
       conectar();  
       try {  
          comando.executeUpdate("INSERT INTO campos VALUES("  
-               + "null, '"+ campos.getNome() + "', '"
-        		+ campos.getTamanho()+ "', "
+               + "null, '"+ campos.getNome() + "', "
+        		+ campos.getTamanho()+ ", "
         		+ campos.isTamanho_fixo()+ ", "
         		+ campos.isObrigatorio()+ ", "
         		+ campos.getId_tabela()+ ", '"
         		+ campos.getTabelaOrigem()+ "', "
         		+ campos.isChave()+ ", '"
         		+ campos.getTipo()+ "', '"
-        		+ campos.getComentario()+ "', "
+        		+ campos.getComentario()+ "' "
         		+ ")");  
          System.out.println("campo "+campos.getId_campo()+" inserido!");  
       } catch (SQLException e) {  
@@ -159,6 +160,6 @@ public class DaoCampos {
       JOptionPane.showMessageDialog(null, msg, "Erro no banco de dados", 0);  
       System.err.println(msg);  
       System.out.println(msgErro);  
-      System.exit(0);  
+      //System.exit(0);  
    }  
 }  

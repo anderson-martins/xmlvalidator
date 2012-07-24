@@ -24,15 +24,14 @@ import javax.swing.table.TableCellRenderer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
+import controller.*;
 
 public class TabelaXML extends AbstractTableModel{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -1684081279215472578L;
-	public static final boolean APPROVED = true;
-	public static final boolean REJECTED = false;
+	
 	NodeList colunas;
 	NodeList linhas;
 	Element columnSection;
@@ -41,6 +40,7 @@ public class TabelaXML extends AbstractTableModel{
 	JScrollPane scrollpane;
 	File arquivoTabela;
 	Document tabela;
+	ValidacaoEstrutural validaEstrutura;
 	
 	public TabelaXML(String documentoXml) throws IOException, ParserConfigurationException, org.xml.sax.SAXException{
 		this.arquivoTabela = new File(documentoXml);
@@ -64,8 +64,18 @@ public class TabelaXML extends AbstractTableModel{
 		scrollpane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		setLarguraMaximaColuna();
-		table.getColumnModel().getColumn(1).setCellRenderer(new StatusColumnCellRenderer());
-			
+		
+		for(int i=0;i<table.getColumnCount();i++)
+			table.getColumnModel().getColumn(i).setCellRenderer(new StatusColumnCellRenderer());
+		
+		validaEstrutura = new ValidacaoEstrutural(arquivoTabela.getName());
+		
+		try{
+			table.getDefaultRenderer(getClass()).wait();
+		}catch (Exception e) {
+			// TODO: handle exception
+		}
+		
 	}
 	
 	
@@ -150,33 +160,25 @@ public class TabelaXML extends AbstractTableModel{
 
 	}
 	// TODO: implementar validacao de campos
-	public boolean getStatus(int row, int column){
-		if (getValueAt(row, column).toString().length() != 2)
-			return REJECTED;
-		return APPROVED;
+	public boolean getStatus(int rowIndex, int columnIndex){
+		return validaEstrutura.valida(this.getColumnName(columnIndex),(String) getValueAt(rowIndex, columnIndex)) ;
 	}
 	
-	/*public void celulaVermelha(int row, int column){
-		TableCellRenderer tcr = table.getCellRenderer(row, column);
-		Component cell = tcr.getTableCellRendererComponent(table, table.getValueAt(row, column), false, false, row, column);
-		cell.setBackground(Color.RED);
-		
-		
-	}*/
+	
 	
 	@SuppressWarnings("serial")
 	public class StatusColumnCellRenderer extends DefaultTableCellRenderer {
 		  @Override
 		  public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
 
-		    //Cells are by default rendered as a JLabel.
+		    //celulas renderizadas como JLabel.
 		    JLabel l = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-		    //Get the status for the current row.
+		    //status da linha atual.
 		    TabelaXML tableModel = (TabelaXML) table.getModel();
-		    if(isSelected && tableModel.getStatus(row, col) == TabelaXML.APPROVED){
+		    if(isSelected && tableModel.getStatus(row, col) == ValidacaoEstrutural.APPROVED){
 		    	l.setBackground(new Color(0,100,160));
 		    }
-		    else if (tableModel.getStatus(row, col) == TabelaXML.REJECTED) {
+		    else if (tableModel.getStatus(row, col) == ValidacaoEstrutural.REJECTED) {
 		      l.setBackground(Color.RED);
 		    } else {
 		    	if(row%2 == 0){

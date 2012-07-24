@@ -44,7 +44,9 @@ import java.util.ResourceBundle;
  * Contains a JLabel to show the text and 
  * a JButton to close the tab it belongs to 
  */ 
+@SuppressWarnings("serial")
 public class ButtonTabComponent extends JPanel {
+	Graphics2D g2;
     private final JTabbedPane pane;
     private static ResourceBundle resources;
     URL url;
@@ -119,7 +121,7 @@ public class ButtonTabComponent extends JPanel {
             setBorderPainted(false);
             //Making nice rollover effect
             //we use the same listener for all buttons
-            addMouseListener(buttonMouseListener);
+            //addMouseListener(buttonMouseListener);
             //setRolloverEnabled(true);
             //Close the proper tab by clicking the button
             addActionListener(this);
@@ -141,7 +143,7 @@ public class ButtonTabComponent extends JPanel {
         protected void paintComponent(Graphics g) {
         	
             super.paintComponent(g);
-            Graphics2D g2 = (Graphics2D) g.create();
+            g2 = (Graphics2D) g.create();
             //shift the image for pressed buttons
             if (getModel().isPressed()) {
                 g2.translate(1, 1);
@@ -159,23 +161,9 @@ public class ButtonTabComponent extends JPanel {
         }
     }
 
-    private final static MouseListener buttonMouseListener = new MouseAdapter() {
-        public void mouseEntered(MouseEvent e) {
-            Component component = e.getComponent();
-            if (component instanceof AbstractButton) {
-                AbstractButton button = (AbstractButton) component;
-                //button.setBorderPainted(true);
-            }
-        }
-
-        public void mouseExited(MouseEvent e) {
-            Component component = e.getComponent();
-            if (component instanceof AbstractButton) {
-                AbstractButton button = (AbstractButton) component;
-                button.setBorderPainted(false);
-            }
-        }
+    
+       
     };
-}
+
 
 

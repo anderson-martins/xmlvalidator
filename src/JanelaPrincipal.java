@@ -178,6 +178,7 @@ public class JanelaPrincipal extends JFrame {
 		
 		
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, propriedades, abas);
+		splitPane.setOneTouchExpandable(true);
 		
 		// add
 		content.setLayout(new BorderLayout());

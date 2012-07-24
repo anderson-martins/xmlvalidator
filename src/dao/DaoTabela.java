@@ -67,24 +67,24 @@ public class DaoTabela {
       }  
    }  
   
-   public Vector<Tabela> buscar(String nome, String layout) {  
+   public Tabela buscar(String nome) {  
       conectar();  
-      Vector<Tabela> resultados = new Vector<Tabela>();  
       ResultSet rs;  
       try {  
-         rs = comando.executeQuery("SELECT * FROM tabela WHERE nome = '"  
-               + nome + "' AND layout = '"+layout+"';");  
-         while (rs.next()) {  
-            Tabela temp = new Tabela();  
-            // pega todos os atributos da tabela 
-            temp.setId_tabela(rs.getInt("id_tabela"));  
-            temp.setNome(rs.getString("nome"));  
-            temp.setLayout(rs.getString("layout"));   
-            resultados.add(temp);  
-         }  
-         return resultados;  
+    	  rs = comando.executeQuery("SELECT * FROM tabela WHERE nome = '"+ nome + "' ORDER BY layout DESC LIMIT 1;");  
+    	  if(rs.first()){
+	          Tabela temp = new Tabela();  
+	          // pega todos os atributos da tabela 
+	          temp.setId_tabela(rs.getInt("id_tabela"));  
+	          temp.setNome(rs.getString("nome"));  
+	          temp.setLayout(rs.getString("layout"));   
+	          fechar();
+	          return temp; 
+    	  }else
+    		  System.out.println("nao encontrou");
+    	  return null;
       } catch (SQLException e) {  
-         imprimeErro("Erro ao buscar tabela", e.getMessage());  
+         imprimeErro("Sem layout cadastrado para a tabela "+nome, e.getMessage());  
          return null;  
       }  
   
@@ -108,7 +108,7 @@ public class DaoTabela {
      try{
     	 comando = con.createStatement();  
      }catch (SQLException e) {
-		System.err.println(e.getMessage());
+		System.err.println("erro ao conectar: " +e.getMessage());
 	}
      System.out.println("Conectado!");  
        
@@ -128,6 +128,6 @@ public class DaoTabela {
       JOptionPane.showMessageDialog(null, msg, "Erro no banco de dados", 0);  
       System.err.println(msg);  
       System.out.println(msgErro);  
-      System.exit(0);  
-   }  
+      //System.exit(0);  
+   }
 }  

@@ -5,7 +5,7 @@ public class Campos {
 	private String nome;
 	private int tamanho;
 	private boolean tamanho_fixo;
-	private boolean obrigatorio;
+	private String obrigatorio;
 	private String tabelaOrigem;
 	private boolean chave;
 	private String tipo;
@@ -36,10 +36,10 @@ public class Campos {
 	public void setTamanho_fixo(boolean tamanho_fixo) {
 		this.tamanho_fixo = tamanho_fixo;
 	}
-	public boolean isObrigatorio() {
+	public String isObrigatorio() {
 		return obrigatorio;
 	}
-	public void setObrigatorio(boolean obrigatorio) {
+	public void setObrigatorio(String obrigatorio) {
 		this.obrigatorio = obrigatorio;
 	}
 	public String getTabelaOrigem() {

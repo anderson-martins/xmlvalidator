@@ -1,5 +1,7 @@
 package dao.banco;
 
+
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -8,7 +10,7 @@ import java.sql.Statement;
 
 public class ConFactory {
 	private static final String STR_DRIVER = "com.mysql.jdbc.Driver";  
-    private static final String DATABASE = "test";  
+    private static final String DATABASE = "xmlvalidator";  
     private static final String IP = "localhost";   
     private static final String STR_CON = "jdbc:mysql://" + IP + ":3306/" + DATABASE;  
     private static final String USER = "root";  
@@ -51,5 +53,19 @@ public static Connection getConexao() {
 			System.out.println("Erro ao fechar conexao.");
 		}
     }
+   /* public static void main(String[] args) {
+		getConexao();
+		try{
+			Statement statement = con.createStatement();
+			ResultSet pessoa = statement.executeQuery("select nome from tabela");
+			while(pessoa.next()){
+				System.out.println("Nome: "+ pessoa.getString("nome"));
+			}
+		}catch (SQLException sqle) {
+			// TODO: handle exception
+			System.out.println("Erro: "+ sqle.getMessage());
+		}
+    	fechaConexao();
+	}*/
 
 }
