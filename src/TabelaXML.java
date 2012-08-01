@@ -65,17 +65,9 @@ public class TabelaXML extends AbstractTableModel{
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		setLarguraMaximaColuna();
 		
-		for(int i=0;i<table.getColumnCount();i++)
-			table.getColumnModel().getColumn(i).setCellRenderer(new StatusColumnCellRenderer());
-		
 		validaEstrutura = new ValidacaoEstrutural(arquivoTabela.getName());
 		
-		try{
-			table.getDefaultRenderer(getClass()).wait();
-		}catch (Exception e) {
-			// TODO: handle exception
-		}
-		
+			
 	}
 	
 	
@@ -160,9 +152,25 @@ public class TabelaXML extends AbstractTableModel{
 
 	}
 	// TODO: implementar validacao de campos
-	public boolean getStatus(int rowIndex, int columnIndex){
-		return validaEstrutura.valida(this.getColumnName(columnIndex),(String) getValueAt(rowIndex, columnIndex)) ;
+	public String getStatus(int rowIndex, int columnIndex){
+			return validaEstrutura.valida(this.getColumnName(columnIndex),(String) getValueAt(rowIndex, columnIndex)) ;
 	}
+	public void fireTableValidation(){
+		for(int i=0;i<table.getColumnCount();i++)
+			table.getColumnModel().getColumn(i).setCellRenderer(new StatusColumnCellRenderer());
+		fireTableDataChanged();
+	}
+	public void stopTableValidation(){
+		for(int i=0;i<table.getColumnCount();i++)
+			table.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer());
+		fireTableDataChanged();
+	}
+	
+	
+	public void validate() {}
+	public void revalidate() {}
+	protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {}
+	public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {}
 	
 	
 	
@@ -179,8 +187,13 @@ public class TabelaXML extends AbstractTableModel{
 		    	l.setBackground(new Color(0,100,160));
 		    }
 		    else if (tableModel.getStatus(row, col) == ValidacaoEstrutural.REJECTED) {
-		      l.setBackground(Color.RED);
-		    } else {
+		    	l.setBackground(Color.RED);
+		    }else if(tableModel.getStatus(row, col) == ValidacaoEstrutural.REJECTED_SIZE){
+		    	l.setBackground(Color.YELLOW);
+		    }else if(tableModel.getStatus(row, col) == ValidacaoEstrutural.REJECTED_NOT_EXISTS){
+		    	l.setBackground(Color.MAGENTA);
+		    }else {
+		    
 		    	if(row%2 == 0){
 		    		l.setBackground(new Color(242,242,242));
 		    	} else{

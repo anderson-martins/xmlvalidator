@@ -39,6 +39,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import controller.MacAddress;
+
 
 
 
@@ -61,7 +63,11 @@ public class JanelaPrincipal extends JFrame {
 	protected Hashtable<String, TabelaXML> hTabelas;
 	
 	public  void createWindow(){
-						
+		try{
+			System.out.println(MacAddress.getMacAddsess());				
+		}catch (Exception e) {
+			System.out.println("Não foi possível ler o MAC ADDRESS: " + e.getMessage());
+		}
 		GraphicsEnvironment localGE = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		Rectangle center = localGE.getMaximumWindowBounds(); // tamanho maximo
 		
@@ -124,6 +130,7 @@ public class JanelaPrincipal extends JFrame {
 		//validar
 		
 		JMenu menuValidar = new JMenu("Validar");
+		menuValidar.addActionListener(new ValidateAction());
 		url = getResource("validarImage");
 		JMenuItem menuValidarValidar = new  JMenuItem("Validar");
 		if (url != null) {
@@ -152,12 +159,16 @@ public class JanelaPrincipal extends JFrame {
 		JButton saveFile = new JButton(new ImageIcon(getResource("saveImage")));
 		saveFile.addActionListener(new SaveAction());
 		JButton btValida = new JButton(new ImageIcon(getResource("validarImage")));
+		btValida.addActionListener(new ValidateAction());
+		JButton btStop = new JButton(new ImageIcon(getResource("stopImage")));
+		btStop.addActionListener(new StopValidateAction());
 		
 		toolBar.add(newFile);
 		toolBar.add(openFile);
 		toolBar.add(saveFile);
 		toolBar.addSeparator();
 		toolBar.add(btValida);
+		toolBar.add(btStop);
 		
 		//status
 		JLabel statusBar = new JLabel("Validação de arquivos XML");
@@ -300,7 +311,7 @@ public class JanelaPrincipal extends JFrame {
 	class EditTabela implements TableModelListener{
 		
 
-		
+		@Override
 		public void tableChanged(TableModelEvent ev) {
 			if (!alterado){
 				abas.setTitleAt(abas.getSelectedIndex(), "*"+abas.getTitleAt(abas.getSelectedIndex()));
@@ -308,8 +319,7 @@ public class JanelaPrincipal extends JFrame {
 			}
 			
 		}
-
-		
+				
 	}
 	class SaveAction extends AbstractAction{
 		public void actionPerformed(ActionEvent e){
@@ -334,6 +344,16 @@ public class JanelaPrincipal extends JFrame {
 			
 			}
 			
+		}
+	}
+	class ValidateAction extends AbstractAction{
+		public void actionPerformed(ActionEvent e){
+			tabela.fireTableValidation();
+		}
+	}
+	class StopValidateAction extends AbstractAction{
+		public void actionPerformed(ActionEvent e){
+			tabela.stopTableValidation();
 		}
 	}
 

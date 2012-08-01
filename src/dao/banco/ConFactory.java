@@ -62,7 +62,7 @@ public static Connection getConexao() {
 				System.out.println("Nome: "+ pessoa.getString("nome"));
 			}
 		}catch (SQLException sqle) {
-			// TODO: handle exception
+			
 			System.out.println("Erro: "+ sqle.getMessage());
 		}
     	fechaConexao();

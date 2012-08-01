@@ -4,7 +4,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;  
 import java.sql.SQLException;  
 import java.sql.Statement;  
-import java.util.Vector;  
+import java.util.Hashtable;
+ 
   
 import javax.swing.JOptionPane;  
   
@@ -30,9 +31,9 @@ public class DaoCampos {
       }  
    }  
   
-   public Vector<Campos> buscarTodos() {  
+   public Hashtable<String, Campos> buscarTodos() {  
       conectar();  
-      Vector<Campos> resultados = new Vector<Campos>();  
+      Hashtable<String, Campos> resultados = new Hashtable<String, Campos>();  
       ResultSet rs;  
       try {  
          rs = comando.executeQuery("SELECT * FROM campos");  
@@ -51,7 +52,8 @@ public class DaoCampos {
             temp.setTipo(rs.getString("tipo"));
             
      
-            resultados.add(temp);  
+            resultados.put(temp.getNome()+temp.getId_tabela(),temp);  
+           
          }  
          return resultados;  
       } catch (SQLException e) {  
