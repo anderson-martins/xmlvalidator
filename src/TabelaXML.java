@@ -16,6 +16,8 @@ import org.xml.sax.InputSource;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
@@ -60,10 +62,14 @@ public class TabelaXML extends AbstractTableModel{
 		
 		table = new JTable();
 		table.setModel(this);
-		table.setAutoCreateRowSorter(true);
+		table.getTableHeader().setReorderingAllowed(false);// desabilita drag do cabeçaho da coluna
+		table.setAutoCreateRowSorter(false);
 		scrollpane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		setLarguraMaximaColuna();
+		JTable rowTable = new RowNumberTable(table);
+		scrollpane.setRowHeaderView(rowTable);
+		scrollpane.setCorner(JScrollPane.UPPER_LEFT_CORNER, rowTable.getTableHeader());
 		
 		validaEstrutura = new ValidacaoEstrutural(arquivoTabela.getName());
 		
@@ -114,6 +120,7 @@ public class TabelaXML extends AbstractTableModel{
 		rowSection = (Element) linhas.item(row);	
 		rowSection.setAttribute(getColumnName(column),(String) valor);
 		fireTableCellUpdated(row, column); //avisa o listener
+		fireTableDataChanged();
 	}
 	
 	public void setLarguraMaximaColuna(){

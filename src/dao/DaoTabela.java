@@ -81,7 +81,7 @@ public class DaoTabela {
 	          fechar();
 	          return temp; 
     	  }else
-    		  System.out.println("nao encontrou");
+    		  System.out.println("nao encontrou a tabela "+nome);
     	  return null;
       } catch (SQLException e) {  
          imprimeErro("Sem layout cadastrado para a tabela "+nome, e.getMessage());  

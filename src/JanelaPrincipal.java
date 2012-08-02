@@ -1,9 +1,12 @@
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
@@ -27,13 +30,18 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreeSelectionModel;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -61,6 +69,9 @@ public class JanelaPrincipal extends JFrame {
 	JPanel painelAbas;
 	protected boolean alterado;
 	protected Hashtable<String, TabelaXML> hTabelas;
+	JTextField pathXML;
+	JTree fileTree;
+	FileSystemModel fileSystemModel;
 	
 	public  void createWindow(){
 		try{
@@ -150,9 +161,8 @@ public class JanelaPrincipal extends JFrame {
 		menuRelatorios.setMnemonic('R');
 		menuBar.add(menuRelatorios);
 		
-		//********************************* fim menu ************************************
-				
-		
+		//********************************* toolbar ************************************
+			
 		JButton newFile = new JButton(new ImageIcon(getResource("newImage")));
 		JButton openFile = new JButton(new ImageIcon(getResource("openImage")));
 		openFile.addActionListener(new OpenAction());
@@ -162,13 +172,22 @@ public class JanelaPrincipal extends JFrame {
 		btValida.addActionListener(new ValidateAction());
 		JButton btStop = new JButton(new ImageIcon(getResource("stopImage")));
 		btStop.addActionListener(new StopValidateAction());
+		pathXML = new JTextField("c:\\aplic");
+		pathXML.setColumns(15);
+		pathXML.setEditable(false);
+		JButton buscaPathXML = new JButton("buscar");
+		buscaPathXML.addActionListener(new BuscaPathXMLAction());
 		
 		toolBar.add(newFile);
 		toolBar.add(openFile);
 		toolBar.add(saveFile);
-		toolBar.addSeparator();
+		toolBar.addSeparator();// -----
 		toolBar.add(btValida);
 		toolBar.add(btStop);
+		toolBar.addSeparator();// -----
+		toolBar.add(pathXML);
+		toolBar.add(buscaPathXML);
+		
 		
 		//status
 		JLabel statusBar = new JLabel("Validação de arquivos XML");
@@ -177,10 +196,10 @@ public class JanelaPrincipal extends JFrame {
 
 		// JPanel propriedades
 		propriedades.setMinimumSize(new Dimension(content.getWidth()/PROPORCAO_TELA,content.getHeight()/PROPORCAO_TELA));
-		JLabel lbPropriedades = new JLabel("Arquivos");
-		lbPropriedades.setHorizontalAlignment(JLabel.LEADING);
-		propriedades.add(lbPropriedades,BorderLayout.NORTH);
-				
+		fileSystemModel = new FileSystemModel(new File(pathXML.getText()));
+		addTree(pathXML.getText());			
+		
+		
 		// areadas talbelas		
 		abas = new JTabbedPane(JTabbedPane.TOP);
 		abas.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
@@ -227,10 +246,30 @@ public class JanelaPrincipal extends JFrame {
 		
 
 	}
+	
+	public void addTree(String path){
+		
+		
+		fileTree = new JTree(fileSystemModel);
+		fileTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		fileTree.addMouseListener(new MouseAdapter() {
+		
+		      public void mouseClicked(MouseEvent event) {
+		        File file = (File) fileTree.getLastSelectedPathComponent();
+		        if (file.getName().toLowerCase().endsWith("xml") && event.getClickCount() == 2)
+		        	abreAbaXML(file);
+		      }
+		    });
+		fileTree.setAlignmentX(LEFT_ALIGNMENT);
+		fileTree.setBackground(new Color(215,215,225));
+		propriedades.add(fileTree);
+	}
+	
 	public static boolean usingNimbus() {
 		return UIManager.getLookAndFeel().getName().equals("Nimbus");	
 	}
-	 protected URL getResource(String key) {
+	
+	protected URL getResource(String key) {
 		String name = getResourceString(key);
 		if (name != null) {
 		    URL url = getClass().getResource(name);
@@ -239,7 +278,7 @@ public class JanelaPrincipal extends JFrame {
 		return null;
 	}
 	 
-	 protected String getResourceString(String nm) {
+	protected String getResourceString(String nm) {
 		String str;
 		try {
 		    str = resources.getString(nm);
@@ -249,7 +288,7 @@ public class JanelaPrincipal extends JFrame {
 		return str;
 	}
 	 //implementado pela oracle ButtonTabComponent
-	 protected void initTabComponent(int i) {
+	protected void initTabComponent(int i) {
 	        abas.setTabComponentAt(i,
 	                 new ButtonTabComponent(abas));	    
 	 }
@@ -272,52 +311,56 @@ public class JanelaPrincipal extends JFrame {
 	            int ret = chooser.showOpenDialog(getContentPane());
 
 	            if (ret != JFileChooser.APPROVE_OPTION) {
-			return;
-		    }
+	            	return;
+	            }
 
 	            File f = chooser.getSelectedFile();
-		    if (f.isFile() && f.canRead() && f.getName().toLowerCase().endsWith("xml")) {
-		    	
-		    	try {
-					tabela = new TabelaXML(f.getAbsolutePath());
-				} catch (Exception ex) {
-					System.err.println("Erro - abrir arquivo " +ex.getMessage());
-				}
-		    	painelAbas = new JPanel();
-				painelAbas.setMinimumSize(new Dimension((content.getWidth()/PROPORCAO_TELA )*4,content.getHeight()/PROPORCAO_TELA));
-				painelAbas.setLayout(new BorderLayout());
-				
-				abas.add(f.getName(), painelAbas);
-				
-				painelAbas.add(tabela.getPanel());
-		    	
-				alterado = false;
-				
-				initTabComponent(abas.getTabCount()-1); //insere botao fechar na aba
-				abas.setSelectedIndex(abas.getTabCount()-1); // seleciona a aba criada
-		    	tabela.addTableModelListener(new EditTabela());
-		    			    			    	
-		    	hTabelas.put(f.getName(), tabela);
-			
-		    } else {
-	                JOptionPane.showMessageDialog(getContentPane(),
-	                        "Não foi possível abrir a tabela XML ou não é um documento válido: " + f,
-	                        "Erro ao abrir arquivo",
-	                        JOptionPane.ERROR_MESSAGE);
-		    
-		    }
+	            abreAbaXML(f);
 	        }
 	    }
+	public void abreAbaXML(File f){
+		if (f.isFile() && f.canRead() && f.getName().toLowerCase().endsWith("xml")) {
+	    	
+	    	try {
+				tabela = new TabelaXML(f.getAbsolutePath());
+			} catch (Exception ex) {
+				System.err.println("Erro - abrir arquivo " +ex.getMessage());
+			}
+	    	painelAbas = new JPanel();
+			painelAbas.setMinimumSize(new Dimension((content.getWidth()/PROPORCAO_TELA )*4,content.getHeight()/PROPORCAO_TELA));
+			painelAbas.setLayout(new BorderLayout());
+			
+			abas.add(f.getName(), painelAbas);
+			
+			painelAbas.add(tabela.getPanel());
+	    	
+			alterado = false;
+			
+			initTabComponent(abas.getTabCount()-1); //insere botao fechar na aba
+			abas.setSelectedIndex(abas.getTabCount()-1); // seleciona a aba criada
+	    	tabela.addTableModelListener(new EditTabela());
+	    			    			    	
+	    	hTabelas.put(f.getName(), tabela);
+		
+	    } else {
+                JOptionPane.showMessageDialog(getContentPane(),
+                        "Não foi possível abrir a tabela XML ou não é um documento válido: " + f,
+                        "Erro ao abrir arquivo",
+                        JOptionPane.ERROR_MESSAGE);
+	    
+	    }
+	}
 	class EditTabela implements TableModelListener{
 		
 
 		@Override
 		public void tableChanged(TableModelEvent ev) {
-			if (!alterado){
+			if (!alterado){				
+				
 				abas.setTitleAt(abas.getSelectedIndex(), "*"+abas.getTitleAt(abas.getSelectedIndex()));
 				alterado = true;
 			}
-			
+			System.out.println(alterado);
 		}
 				
 	}
@@ -348,12 +391,35 @@ public class JanelaPrincipal extends JFrame {
 	}
 	class ValidateAction extends AbstractAction{
 		public void actionPerformed(ActionEvent e){
-			tabela.fireTableValidation();
+			abas.setTitleAt(abas.getSelectedIndex(), abas.getTitleAt(abas.getSelectedIndex()).replace("*", ""));
+			hTabelas.get(abas.getTitleAt(abas.getSelectedIndex())).fireTableValidation();
+			abas.setTitleAt(abas.getSelectedIndex(), abas.getTitleAt(abas.getSelectedIndex()).replace("*", ""));
+			alterado = false;
 		}
 	}
 	class StopValidateAction extends AbstractAction{
 		public void actionPerformed(ActionEvent e){
-			tabela.stopTableValidation();
+			abas.setTitleAt(abas.getSelectedIndex(), abas.getTitleAt(abas.getSelectedIndex()).replace("*", ""));
+			hTabelas.get(abas.getTitleAt(abas.getSelectedIndex())).stopTableValidation();
+			abas.setTitleAt(abas.getSelectedIndex(), abas.getTitleAt(abas.getSelectedIndex()).replace("*", ""));
+			alterado = false;
+		}
+	}
+	class BuscaPathXMLAction extends AbstractAction{
+		public void actionPerformed(ActionEvent e){
+			JFileChooser chooser = new JFileChooser("c:/"); //se nao abrir nesse diretorio abrirá no default
+            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            chooser.rescanCurrentDirectory();
+            
+            int ret = chooser.showOpenDialog(getContentPane());
+
+            if (ret != JFileChooser.APPROVE_OPTION) {
+            	return;
+            }
+            File f = chooser.getSelectedFile();
+            pathXML.setText(f.getAbsolutePath());
+            fileSystemModel.setRoot(f);
+            addTree(f.getAbsolutePath());
 		}
 	}
 
