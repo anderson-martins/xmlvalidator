@@ -7,6 +7,17 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Vector;
+
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRExporter;
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.view.JasperViewer;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -14,11 +25,8 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
@@ -28,6 +36,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import controller.*;
+import model.Erro;
 
 public class TabelaXML extends AbstractTableModel{
 	/**
@@ -45,6 +54,7 @@ public class TabelaXML extends AbstractTableModel{
 	private Document tabela;
 	private ValidacaoEstrutural validaEstrutura;
 	private boolean existeLayout;
+	private Vector<Erro> vectorErros;
 	
 	public TabelaXML(String documentoXml) throws IOException, ParserConfigurationException, org.xml.sax.SAXException{
 		this.arquivoTabela = new File(documentoXml);
@@ -54,7 +64,6 @@ public class TabelaXML extends AbstractTableModel{
 		factory.setValidating(false);
 		
 		DocumentBuilder parser = factory.newDocumentBuilder();
-		
 		
 		InputStream is = new BufferedInputStream(new FileInputStream(arquivoTabela));
 		tabela = parser.parse(new InputSource(new InputStreamReader(is, "ISO-8859-1"))); //gambiarra suprema para ler em um charset diferente da utf-8 que tava dando pau em algumas XML 
@@ -181,6 +190,31 @@ public class TabelaXML extends AbstractTableModel{
 		for(int i=0;i<table.getColumnCount();i++)
 			table.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer());
 		fireTableDataChanged();
+	}
+	public void relatorioErros(){
+		vectorErros = new Vector<Erro>();
+		
+		for(int i=0; i < getColumnCount(); i++){
+			for(int j=0; j < getRowCount(); j++){
+				if(getStatus(j, i) != ValidacaoEstrutural.APPROVED){
+					vectorErros.add(new Erro(getStatus(j, i),getStatus(j, i)));
+				}
+			}
+		}
+		ErroJRDataSourceFactory.setErros(vectorErros);
+		
+		String fileName = "reports/errors.jasper";
+        String outFileName = "test.pdf";
+        HashMap hm = new HashMap();
+        try {
+            JasperPrint print = JasperFillManager.fillReport(fileName, hm, new JREmptyDataSource());
+            JasperViewer.viewReport(print, false);
+          
+        } catch (JRException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 	}
 	
 	

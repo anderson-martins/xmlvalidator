@@ -169,7 +169,8 @@ public class JanelaPrincipal extends JFrame {
 		btValida.addActionListener(new ValidateAction());
 		JButton btStop = new JButton(new ImageIcon(getResource("stopImage")));
 		btStop.addActionListener(new StopValidateAction());
-			
+		JButton btRelatorioErros = new JButton(new ImageIcon(getResource("relatorioErros")));
+		btRelatorioErros.addActionListener(new RelatorioAction());
 		
 		toolBar.add(newFile);
 		toolBar.add(openFile);
@@ -178,6 +179,7 @@ public class JanelaPrincipal extends JFrame {
 		toolBar.add(btValida);
 		toolBar.add(btStop);
 		toolBar.addSeparator();// -----
+		toolBar.add(btRelatorioErros);
 		
 		
 		
@@ -346,6 +348,7 @@ public class JanelaPrincipal extends JFrame {
 	    
 	    }
 	}
+	
 	class EditTabela implements TableModelListener{
 		
 
@@ -405,6 +408,13 @@ public class JanelaPrincipal extends JFrame {
 			if(!flag)
 				abas.setTitleAt(abas.getSelectedIndex(), abas.getTitleAt(abas.getSelectedIndex()).replace("*", ""));
 			alterado = false;
+		}
+	}
+	class RelatorioAction extends AbstractAction{
+		public void actionPerformed(ActionEvent e){
+			
+			hTabelas.get(abas.getTitleAt(abas.getSelectedIndex()).replace("*", "")).relatorioErros();
+			
 		}
 	}
 	
