@@ -81,7 +81,7 @@ public class DaoTabela {
 	          fechar();
 	          return temp; 
     	  }else
-    		  System.out.println("nao encontrou a tabela "+nome);
+    		  System.err.println("nao encontrou a tabela "+nome);
     	  return null;
       } catch (SQLException e) {  
          imprimeErro("Sem layout cadastrado para a tabela "+nome, e.getMessage());  
@@ -110,7 +110,7 @@ public class DaoTabela {
      }catch (SQLException e) {
 		System.err.println("erro ao conectar: " +e.getMessage());
 	}
-     System.out.println("Conectado!");  
+     //System.out.println("Conectado!");  
        
    }  
   
@@ -118,7 +118,7 @@ public class DaoTabela {
       try {  
          comando.close();  
          con.close();  
-         System.out.println("Conexão Fechada");  
+         //System.out.println("Conexão Fechada");  
       } catch (SQLException e) {  
          imprimeErro("Erro ao fechar conexão", e.getMessage());  
       }  

@@ -23,7 +23,7 @@ public class ValidacaoEstrutural {
 		daoTabela = new DaoTabela();
 		tabela = daoTabela.buscar(this.nomeTabela);
 		daoCampos = new DaoCampos();
-		campos = daoCampos.buscarTodos();
+		campos = daoCampos.buscarTodos(tabela.getId_tabela());
 		
 	}
 	

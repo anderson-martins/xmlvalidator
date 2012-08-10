@@ -31,30 +31,26 @@ public class DaoCampos {
       }  
    }  
   
-   public Hashtable<String, Campos> buscarTodos() {  
-      conectar();  
-      Hashtable<String, Campos> resultados = new Hashtable<String, Campos>();  
-      ResultSet rs;  
-      try {  
-         rs = comando.executeQuery("SELECT * FROM campos");  
-         while (rs.next()) {  
-            Campos temp = new Campos();  
-            
-            temp.setId_campo(rs.getInt("id_campo"));
-            temp.setId_tabela(rs.getInt("id_tabela"));  
-            temp.setNome(rs.getString("nome"));  
-            temp.setChave(rs.getBoolean("chave"));  
-            temp.setComentario(rs.getString("comentario"));
-            temp.setObrigatorio(rs.getString("obrigatorio"));
-            temp.setTabelaOrigem(rs.getString("tabela_origem"));
-            temp.setTamanho(rs.getInt("tamanho"));
-            temp.setTamanho_fixo(rs.getBoolean("tamanho_fixo"));
-            temp.setTipo(rs.getString("tipo"));
-            
-     
-            resultados.put(temp.getNome()+temp.getId_tabela(),temp);  
-           
-         }  
+   public Hashtable<String, Campos> buscarTodos(int idTabela) {
+	   conectar();  
+	   Hashtable<String, Campos> resultados = new Hashtable<String, Campos>();  
+	   ResultSet rs;  
+	   try {
+		   rs = comando.executeQuery("SELECT * FROM campos where id_tabela = "+idTabela);  
+		   while (rs.next()) {  
+			   Campos temp = new Campos();           
+	           temp.setId_campo(rs.getInt("id_campo"));
+	           temp.setId_tabela(rs.getInt("id_tabela"));  
+	           temp.setNome(rs.getString("nome"));  
+	           temp.setChave(rs.getBoolean("chave"));  
+	           temp.setComentario(rs.getString("comentario"));
+	           temp.setObrigatorio(rs.getString("obrigatorio"));
+	           temp.setTabelaOrigem(rs.getString("tabela_origem"));
+	           temp.setTamanho(rs.getInt("tamanho"));
+	           temp.setTamanho_fixo(rs.getBoolean("tamanho_fixo"));
+	           temp.setTipo(rs.getString("tipo"));
+	           resultados.put(temp.getNome()+temp.getId_tabela(),temp);  
+           }  
          return resultados;  
       } catch (SQLException e) {  
          imprimeErro("Erro ao buscar campos", e.getMessage());  
@@ -144,7 +140,7 @@ public class DaoCampos {
      }catch (SQLException e) {
 		System.err.println(e.getMessage());
 	}
-     System.out.println("Conectado!");  
+     //System.out.println("Conectado!");  
        
    }  
   
@@ -152,7 +148,7 @@ public class DaoCampos {
       try {  
          comando.close();  
          con.close();  
-         System.out.println("Conexão Fechada");  
+         //System.out.println("Conexão Fechada");  
       } catch (SQLException e) {  
          imprimeErro("Erro ao fechar conexão", e.getMessage());  
       }  

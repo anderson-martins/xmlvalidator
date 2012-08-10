@@ -69,7 +69,6 @@ public class JanelaPrincipal extends JFrame {
 	JPanel painelAbas;
 	protected boolean alterado;
 	protected Hashtable<String, TabelaXML> hTabelas;
-	JTextField pathXML;
 	JTree fileTree;
 	FileSystemModel fileSystemModel;
 	
@@ -79,12 +78,10 @@ public class JanelaPrincipal extends JFrame {
 		}catch (Exception e) {
 			System.out.println("Não foi possível ler o MAC ADDRESS: " + e.getMessage());
 		}
-		GraphicsEnvironment localGE = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		Rectangle center = localGE.getMaximumWindowBounds(); // tamanho maximo
 		
 		hTabelas = new Hashtable<String, TabelaXML>();
 		url = null;
-		setBounds(center);
+		setExtendedState(MAXIMIZED_BOTH);// maximiza a janela
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		setJMenuBar(menuBar);
@@ -141,9 +138,9 @@ public class JanelaPrincipal extends JFrame {
 		//validar
 		
 		JMenu menuValidar = new JMenu("Validar");
-		menuValidar.addActionListener(new ValidateAction());
 		url = getResource("validarImage");
 		JMenuItem menuValidarValidar = new  JMenuItem("Validar");
+		menuValidarValidar.addActionListener(new ValidateAction());
 		if (url != null) {
 			menuValidarValidar.setHorizontalTextPosition(JButton.RIGHT);
 			menuValidarValidar.setIcon(new ImageIcon(url));
@@ -172,11 +169,7 @@ public class JanelaPrincipal extends JFrame {
 		btValida.addActionListener(new ValidateAction());
 		JButton btStop = new JButton(new ImageIcon(getResource("stopImage")));
 		btStop.addActionListener(new StopValidateAction());
-		pathXML = new JTextField("c:\\aplic");
-		pathXML.setColumns(15);
-		pathXML.setEditable(false);
-		JButton buscaPathXML = new JButton("buscar");
-		buscaPathXML.addActionListener(new BuscaPathXMLAction());
+			
 		
 		toolBar.add(newFile);
 		toolBar.add(openFile);
@@ -185,8 +178,7 @@ public class JanelaPrincipal extends JFrame {
 		toolBar.add(btValida);
 		toolBar.add(btStop);
 		toolBar.addSeparator();// -----
-		toolBar.add(pathXML);
-		toolBar.add(buscaPathXML);
+		
 		
 		
 		//status
@@ -196,8 +188,20 @@ public class JanelaPrincipal extends JFrame {
 
 		// JPanel propriedades
 		propriedades.setMinimumSize(new Dimension(content.getWidth()/PROPORCAO_TELA,content.getHeight()/PROPORCAO_TELA));
-		fileSystemModel = new FileSystemModel(new File(pathXML.getText()));
-		addTree(pathXML.getText());			
+		fileSystemModel = new FileSystemModel(new File("c:\\aplic"));
+		fileTree = new JTree(fileSystemModel);
+		fileTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		fileTree.addMouseListener(new MouseAdapter() {
+		
+		      public void mouseClicked(MouseEvent event) {
+		        File file = (File) fileTree.getLastSelectedPathComponent();
+		        if (file.getName().toLowerCase().endsWith("xml") && event.getClickCount() == 2)
+		        	abreAbaXML(file);
+		      }
+		    });
+		fileTree.setAlignmentX(LEFT_ALIGNMENT);
+		fileTree.setBackground(new Color(215,215,225));
+		propriedades.add(fileTree);			
 		
 		
 		// areadas talbelas		
@@ -247,23 +251,7 @@ public class JanelaPrincipal extends JFrame {
 
 	}
 	
-	public void addTree(String path){
-		
-		
-		fileTree = new JTree(fileSystemModel);
-		fileTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-		fileTree.addMouseListener(new MouseAdapter() {
-		
-		      public void mouseClicked(MouseEvent event) {
-		        File file = (File) fileTree.getLastSelectedPathComponent();
-		        if (file.getName().toLowerCase().endsWith("xml") && event.getClickCount() == 2)
-		        	abreAbaXML(file);
-		      }
-		    });
-		fileTree.setAlignmentX(LEFT_ALIGNMENT);
-		fileTree.setBackground(new Color(215,215,225));
-		propriedades.add(fileTree);
-	}
+	
 	
 	public static boolean usingNimbus() {
 		return UIManager.getLookAndFeel().getName().equals("Nimbus");	
@@ -320,7 +308,15 @@ public class JanelaPrincipal extends JFrame {
 	    }
 	public void abreAbaXML(File f){
 		if (f.isFile() && f.canRead() && f.getName().toLowerCase().endsWith("xml")) {
-	    	
+	    	if(hTabelas.get(f.getName()) != null){
+	    		for(int i=0; i < abas.getTabCount(); i++){
+	    			if(abas.getTitleAt(i).equals(f.getName())){
+	    				abas.setSelectedIndex(i);
+	    				return;
+	    			}
+	    		}
+	    	}
+	    		
 	    	try {
 				tabela = new TabelaXML(f.getAbsolutePath());
 			} catch (Exception ex) {
@@ -360,7 +356,7 @@ public class JanelaPrincipal extends JFrame {
 				abas.setTitleAt(abas.getSelectedIndex(), "*"+abas.getTitleAt(abas.getSelectedIndex()));
 				alterado = true;
 			}
-			System.out.println(alterado);
+			
 		}
 				
 	}
@@ -391,36 +387,27 @@ public class JanelaPrincipal extends JFrame {
 	}
 	class ValidateAction extends AbstractAction{
 		public void actionPerformed(ActionEvent e){
-			abas.setTitleAt(abas.getSelectedIndex(), abas.getTitleAt(abas.getSelectedIndex()).replace("*", ""));
-			hTabelas.get(abas.getTitleAt(abas.getSelectedIndex())).fireTableValidation();
-			abas.setTitleAt(abas.getSelectedIndex(), abas.getTitleAt(abas.getSelectedIndex()).replace("*", ""));
+			boolean flag = false;
+			if(abas.getTitleAt(abas.getSelectedIndex()).contains("*"))
+				flag = true;
+			hTabelas.get(abas.getTitleAt(abas.getSelectedIndex()).replace("*", "")).fireTableValidation();
+			if(!flag)
+				abas.setTitleAt(abas.getSelectedIndex(), abas.getTitleAt(abas.getSelectedIndex()).replace("*", ""));
 			alterado = false;
 		}
 	}
 	class StopValidateAction extends AbstractAction{
 		public void actionPerformed(ActionEvent e){
-			abas.setTitleAt(abas.getSelectedIndex(), abas.getTitleAt(abas.getSelectedIndex()).replace("*", ""));
-			hTabelas.get(abas.getTitleAt(abas.getSelectedIndex())).stopTableValidation();
-			abas.setTitleAt(abas.getSelectedIndex(), abas.getTitleAt(abas.getSelectedIndex()).replace("*", ""));
+			boolean flag = false;
+			if(abas.getTitleAt(abas.getSelectedIndex()).contains("*"))
+				flag = true;
+			hTabelas.get(abas.getTitleAt(abas.getSelectedIndex()).replace("*", "")).stopTableValidation();
+			if(!flag)
+				abas.setTitleAt(abas.getSelectedIndex(), abas.getTitleAt(abas.getSelectedIndex()).replace("*", ""));
 			alterado = false;
 		}
 	}
-	class BuscaPathXMLAction extends AbstractAction{
-		public void actionPerformed(ActionEvent e){
-			JFileChooser chooser = new JFileChooser("c:/"); //se nao abrir nesse diretorio abrirá no default
-            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            chooser.rescanCurrentDirectory();
-            
-            int ret = chooser.showOpenDialog(getContentPane());
-
-            if (ret != JFileChooser.APPROVE_OPTION) {
-            	return;
-            }
-            File f = chooser.getSelectedFile();
-            pathXML.setText(f.getAbsolutePath());
-            fileSystemModel.setRoot(f);
-            addTree(f.getAbsolutePath());
-		}
-	}
+	
+	
 
 }

@@ -21,9 +21,9 @@ public static Connection getConexao() {
         
         try {  
             Class.forName(STR_DRIVER); 
-            System.out.println("Obtendo conexao..."); 
+            //System.out.println("Obtendo conexao..."); 
             con = DriverManager.getConnection(STR_CON, USER, PASSWORD);  
-            System.out.println("Conectado!");  
+            //System.out.println("Conectado!");  
         }catch(ClassNotFoundException c){
         	System.out.println("Classe não encontrada " + c.getMessage());
         }

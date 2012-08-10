@@ -14,6 +14,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
@@ -34,15 +35,16 @@ public class TabelaXML extends AbstractTableModel{
 	 */
 	private static final long serialVersionUID = -1684081279215472578L;
 	
-	NodeList colunas;
-	NodeList linhas;
-	Element columnSection;
-	Element rowSection;
-	JTable table;
-	JScrollPane scrollpane;
-	File arquivoTabela;
-	Document tabela;
-	ValidacaoEstrutural validaEstrutura;
+	private NodeList colunas;
+	private NodeList linhas;
+	private Element columnSection;
+	private Element rowSection;
+	private JTable table;
+	private JScrollPane scrollpane;
+	private File arquivoTabela;
+	private Document tabela;
+	private ValidacaoEstrutural validaEstrutura;
+	private boolean existeLayout;
 	
 	public TabelaXML(String documentoXml) throws IOException, ParserConfigurationException, org.xml.sax.SAXException{
 		this.arquivoTabela = new File(documentoXml);
@@ -70,8 +72,14 @@ public class TabelaXML extends AbstractTableModel{
 		JTable rowTable = new RowNumberTable(table);
 		scrollpane.setRowHeaderView(rowTable);
 		scrollpane.setCorner(JScrollPane.UPPER_LEFT_CORNER, rowTable.getTableHeader());
+		try{
+			validaEstrutura = new ValidacaoEstrutural(arquivoTabela.getName());
+			existeLayout = true;
+		}catch(NullPointerException npe){
+			System.err.println("erro ao encontrar layout");		
+			existeLayout = false;
+		}
 		
-		validaEstrutura = new ValidacaoEstrutural(arquivoTabela.getName());
 		
 			
 	}
@@ -160,12 +168,14 @@ public class TabelaXML extends AbstractTableModel{
 	}
 	// TODO: implementar validacao de campos
 	public String getStatus(int rowIndex, int columnIndex){
+		if(existeLayout)
 			return validaEstrutura.valida(this.getColumnName(columnIndex),(String) getValueAt(rowIndex, columnIndex)) ;
+		return ValidacaoEstrutural.REJECTED_NOT_EXISTS;
 	}
 	public void fireTableValidation(){
 		for(int i=0;i<table.getColumnCount();i++)
 			table.getColumnModel().getColumn(i).setCellRenderer(new StatusColumnCellRenderer());
-		fireTableDataChanged();
+		fireTableDataChanged();	
 	}
 	public void stopTableValidation(){
 		for(int i=0;i<table.getColumnCount();i++)

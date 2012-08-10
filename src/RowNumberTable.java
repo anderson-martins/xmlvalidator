@@ -134,6 +134,9 @@ public class RowNumberTable extends JTable
 		    	} else{
 		    		l.setBackground(Color.WHITE);
 		    	}
+			l.setForeground(Color.LIGHT_GRAY);
+			l.setHorizontalAlignment(CENTER);
+			
 			 /*
 			 if (table != null)
 			{
