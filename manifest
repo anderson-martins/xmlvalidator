@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Main-Class: JanelaPrincipal
+
+Name: controller/
+Sealed: true
+
+Name: model/
+Sealed: true
+
+Name: dao/banco/
+Sealed: true
+
+Name: dao/
+Sealed: true
+
+Name: /
+Sealed: true
+

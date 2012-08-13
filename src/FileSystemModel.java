@@ -10,7 +10,7 @@ import javax.swing.tree.TreePath;
 class FileSystemModel implements TreeModel {
   private File root;
 
-  private Vector listeners = new Vector();
+  private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
 
   public FileSystemModel(File rootDirectory) {
     root = rootDirectory;
@@ -72,7 +72,7 @@ class FileSystemModel implements TreeModel {
 
   private void fireTreeNodesChanged(TreePath parentPath, int[] indices, Object[] children) {
     TreeModelEvent event = new TreeModelEvent(this, parentPath, indices, children);
-    Iterator iterator = listeners.iterator();
+    Iterator<TreeModelListener> iterator = listeners.iterator();
     TreeModelListener listener = null;
     while (iterator.hasNext()) {
       listener = (TreeModelListener) iterator.next();
@@ -89,7 +89,12 @@ class FileSystemModel implements TreeModel {
   }
 
   private class TreeFile extends File {
-    public TreeFile(File parent, String child) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public TreeFile(File parent, String child) {
       super(parent, child);
     }
 

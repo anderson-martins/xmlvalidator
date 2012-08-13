@@ -7,16 +7,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
 import java.util.Vector;
 
-import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JRExporter;
-import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.view.JasperViewer;
 
 import org.w3c.dom.Document;
@@ -201,13 +199,11 @@ public class TabelaXML extends AbstractTableModel{
 				}
 			}
 		}
-		ErroJRDataSourceFactory.setErros(vectorErros);
 		
-		String fileName = "reports/errors.jasper";
-        String outFileName = "test.pdf";
-        HashMap hm = new HashMap();
         try {
-            JasperPrint print = JasperFillManager.fillReport(fileName, hm, new JREmptyDataSource());
+        	JasperReport report = JasperCompileManager.compileReport("reports/errors.jrxml");
+            
+        	JasperPrint print = JasperFillManager.fillReport(report, null, new JRBeanCollectionDataSource(vectorErros));
             JasperViewer.viewReport(print, false);
           
         } catch (JRException e) {
