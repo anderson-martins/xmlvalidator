@@ -1,3 +1,4 @@
+package view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -42,6 +43,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import view.TabelaXML;
+
 import controller.MacAddress;
 
 
@@ -83,7 +86,7 @@ public class JanelaPrincipal extends JFrame {
 		
 		//Resources
 		try {
-			resources = ResourceBundle.getBundle("resources.JanelaPrincipal",Locale.getDefault());
+			resources = ResourceBundle.getBundle("view.resources.JanelaPrincipal",Locale.getDefault());
 		} catch (Exception e) {
 			System.err.println("erro - Resource "+e.getMessage());
 		}
@@ -305,10 +308,10 @@ public class JanelaPrincipal extends JFrame {
 	    }
 	public void abreAbaXML(File f){
 		if (f.isFile() && f.canRead() && f.getName().toLowerCase().endsWith("xml")) {
-	    	if(hTabelas.get(f.getName()) != null){
+	    	if(hTabelas.get(f.getName()) != null){ 
 	    		for(int i=0; i < abas.getTabCount(); i++){
 	    			if(abas.getTitleAt(i).equals(f.getName())){
-	    				abas.setSelectedIndex(i);
+	    				abas.setSelectedIndex(i); // se já existe na hTabelas seleciona o indice
 	    				return;
 	    			}
 	    		}

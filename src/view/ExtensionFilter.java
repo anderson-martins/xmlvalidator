@@ -1,3 +1,4 @@
+package view;
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
 

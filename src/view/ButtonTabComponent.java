@@ -1,3 +1,4 @@
+package view;
 /*
  * Copyright (c) 1995, 2008, Oracle and/or its affiliates. All rights reserved.
  *
@@ -75,7 +76,7 @@ public class ButtonTabComponent extends JPanel {
         label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         
         try {
-			resources = ResourceBundle.getBundle("resources.JanelaPrincipal",Locale.getDefault());
+			resources = ResourceBundle.getBundle("view.resources.JanelaPrincipal",Locale.getDefault());
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		}
