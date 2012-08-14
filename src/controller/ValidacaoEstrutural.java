@@ -8,9 +8,9 @@ import model.*;
 
 public class ValidacaoEstrutural {
 	public static final String APPROVED = "APPROVED";
-	public static final String REJECTED = "REJECTED";
-	public static final String REJECTED_SIZE = "REJECTED_SIZE";
-	public static final String REJECTED_NOT_EXISTS = "REJECED_NOT_EXISTS";
+	public static final String REJECTED = "Campo obrigatório";
+	public static final String REJECTED_SIZE = "Campo com tamanho inválido";
+	public static final String REJECTED_NOT_EXISTS = "Não existe no layout";
 	
 	private DaoTabela daoTabela;
 	private DaoCampos daoCampos;
@@ -19,9 +19,10 @@ public class ValidacaoEstrutural {
 	private Hashtable<String, Campos> campos;
 	
 	public ValidacaoEstrutural(String nomeTabela){
-		this.nomeTabela = nomeTabela.replace(".xml", "");
+		this.nomeTabela = nomeTabela.replaceAll("(?i).xml", "");
+		System.out.println(this.nomeTabela);
 		daoTabela = new DaoTabela();
-		tabela = daoTabela.buscar(this.nomeTabela);
+		tabela = daoTabela.buscar(this.nomeTabela.toUpperCase());
 		daoCampos = new DaoCampos();
 		campos = daoCampos.buscarTodos(tabela.getId_tabela());
 		

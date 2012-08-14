@@ -10,15 +10,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Vector;
 
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import net.sf.jasperreports.view.JasperViewer;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -37,7 +29,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import controller.*;
-import model.Erro;
+
 
 public class TabelaXML extends AbstractTableModel{
 	/**
@@ -55,7 +47,7 @@ public class TabelaXML extends AbstractTableModel{
 	private Document tabela;
 	private ValidacaoEstrutural validaEstrutura;
 	private boolean existeLayout;
-	private Vector<Erro> vectorErros;
+
 	
 	public TabelaXML(String documentoXml) throws IOException, ParserConfigurationException, org.xml.sax.SAXException{
 		this.arquivoTabela = new File(documentoXml);
