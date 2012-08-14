@@ -5,6 +5,14 @@ public class Erro {
 	private String codErro;
 	private String erro;
 	private String tabela;
+	private String coluna;
+	
+	public String getColuna() {
+		return coluna;
+	}
+	public void setColuna(String coluna) {
+		this.coluna = coluna;
+	}
 	public String getTabela() {
 		return tabela;
 	}
@@ -12,9 +20,11 @@ public class Erro {
 		this.tabela = tabela;
 	}
 	public Erro(){}
-	public Erro(String codErro, String erro){
+	public Erro(String codErro, String erro, String tabela, String coluna){
 		this.codErro = codErro;
 		this.erro = erro;
+		this.tabela = tabela;
+		this.coluna = coluna;
 	}
 	public String getCodErro() {
 		return codErro;

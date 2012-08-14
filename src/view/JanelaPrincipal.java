@@ -10,7 +10,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -46,6 +49,7 @@ import javax.xml.transform.stream.StreamResult;
 import view.TabelaXML;
 
 import controller.MacAddress;
+import controller.RelatorioErros;
 
 
 
@@ -409,13 +413,23 @@ public class JanelaPrincipal extends JFrame {
 		}
 	}
 	class RelatorioAction extends AbstractAction{
-		public void actionPerformed(ActionEvent e){
+		
+		public void actionPerformed(ActionEvent e){	
 			
-			hTabelas.get(abas.getTitleAt(abas.getSelectedIndex()).replace("*", "")).relatorioErros();
-			
+			LinkedList<TabelaXML> listTabelaXML = new LinkedList<TabelaXML>();
+			File diretorio = new File("c:/aplic");
+			File arquivos[] = diretorio.listFiles();
+			for(int i=0;i < arquivos.length;i++){
+				if(arquivos[i].getName().toLowerCase().endsWith(".xml")){
+					File arquivo = arquivos[i];
+					try{
+						listTabelaXML.add(new TabelaXML(arquivo.getAbsolutePath()));
+					}catch (Exception ex) {
+						System.out.println("erro ao gerar relatório");
+					}
+				}
+			}
+			RelatorioErros.relatorio(listTabelaXML);
 		}
 	}
-	
-	
-
 }

@@ -191,31 +191,7 @@ public class TabelaXML extends AbstractTableModel{
 		for(int i=0;i<table.getColumnCount();i++)
 			table.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer());
 		fireTableDataChanged();
-	}
-	public void relatorioErros(){
-		vectorErros = new Vector<Erro>();
-		
-		for(int i=0; i < getColumnCount(); i++){
-			for(int j=0; j < getRowCount(); j++){
-				if(getStatus(j, i) != ValidacaoEstrutural.APPROVED){
-					vectorErros.add(new Erro(getStatus(j, i),getStatus(j, i)));
-				}
-			}
-		}
-		
-        try {
-        	JasperReport report = JasperCompileManager.compileReport("reports/errors.jrxml");
-            
-        	JasperPrint print = JasperFillManager.fillReport(report, null, new JRBeanCollectionDataSource(vectorErros));
-            JasperViewer.viewReport(print, false);
-          
-        } catch (JRException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-	}
-	
+	}	
 	
 	public void validate() {}
 	public void revalidate() {}

@@ -1,43 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="errors" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="caa72082-2244-41e6-b6c9-5b9e684a2990">
-	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.zoom" value="1.1000000000000005"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="13"/>
+	<property name="ireport.y" value="0"/>
 	<field name="erro" class="java.lang.String"/>
+	<field name="codErro" class="java.lang.String"/>
+	<field name="tabela" class="java.lang.String"/>
+	<field name="coluna" class="java.lang.String"/>
+	<variable name="codErro_1" class="java.lang.Integer" resetType="Group" resetGroup="tabelas" calculation="Count">
+		<variableExpression><![CDATA[$F{codErro}]]></variableExpression>
+	</variable>
+	<group name="tabelas">
+		<groupExpression><![CDATA[$F{tabela}]]></groupExpression>
+		<groupHeader>
+			<band height="41">
+				<textField>
+					<reportElement uuid="0094da56-4b7a-425c-a48a-9dfb6bfaeeef" x="17" y="0" width="476" height="20" backcolor="#CCCCFF"/>
+					<textElement>
+						<font size="12" isBold="true" isUnderline="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tabela}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="886c69ba-a0c5-480c-839a-73528f1d381e" x="17" y="19" width="100" height="20"/>
+					<textElement/>
+					<text><![CDATA[Linha]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="7692129d-243d-4234-be28-e6a9c1ab7113" x="125" y="19" width="100" height="20"/>
+					<textElement/>
+					<text><![CDATA[erro]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="5d95e287-1b82-48ac-954f-c549cb43d352" x="503" y="19" width="100" height="20"/>
+					<textElement/>
+					<text><![CDATA[coluna]]></text>
+				</staticText>
+				<line>
+					<reportElement uuid="feb4fa11-1465-4108-be5c-90c3bd4257e6" x="14" y="38" width="776" height="1"/>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="27">
+				<textField>
+					<reportElement uuid="a0f7cd09-6df9-413c-be36-e454828fb6be" x="666" y="0" width="100" height="20"/>
+					<textElement/>
+					<textFieldExpression><![CDATA[$V{codErro_1}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="ff073f60-bf01-448d-802a-70c6bad67d9f" x="575" y="0" width="91" height="20"/>
+					<textElement/>
+					<text><![CDATA[Total de erros:]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="79" splitType="Stretch"/>
-	</title>
-	<pageHeader>
-		<band height="35" splitType="Stretch"/>
-	</pageHeader>
-	<columnHeader>
-		<band height="22" splitType="Stretch">
+		<band height="33" splitType="Stretch">
 			<staticText>
-				<reportElement uuid="7692129d-243d-4234-be28-e6a9c1ab7113" x="11" y="0" width="100" height="20"/>
-				<textElement/>
-				<text><![CDATA[erro]]></text>
+				<reportElement uuid="ea86119b-8004-4aa5-a4f1-228a17373591" x="14" y="9" width="776" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RELAÇÃO DE INCONSISTÊNCIAS]]></text>
 			</staticText>
 		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
 	</columnHeader>
 	<detail>
 		<band height="23" splitType="Stretch">
 			<textField>
-				<reportElement uuid="2684241d-9ceb-4fb5-964c-36178b535dae" x="11" y="0" width="100" height="20"/>
+				<reportElement uuid="2684241d-9ceb-4fb5-964c-36178b535dae" x="125" y="0" width="378" height="20"/>
 				<textElement/>
 				<textFieldExpression><![CDATA[$F{erro}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="2552b4e9-52a5-485f-beaa-5c02e6b5390a" x="17" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{codErro}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="22c3e5cb-d23b-48ae-939c-24185879d660" x="503" y="0" width="299" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{coluna}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
 	<columnFooter>
-		<band height="45" splitType="Stretch"/>
+		<band height="18" splitType="Stretch"/>
 	</columnFooter>
 	<pageFooter>
-		<band height="54" splitType="Stretch"/>
+		<band height="10" splitType="Stretch"/>
 	</pageFooter>
 	<summary>
-		<band height="42" splitType="Stretch"/>
+		<band height="13" splitType="Stretch"/>
 	</summary>
 </jasperReport>
