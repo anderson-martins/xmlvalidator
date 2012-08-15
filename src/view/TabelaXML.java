@@ -20,6 +20,7 @@ import org.xml.sax.InputSource;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
@@ -72,6 +73,7 @@ public class TabelaXML extends AbstractTableModel{
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		setLarguraMaximaColuna();
 		JTable rowTable = new RowNumberTable(table);
+		rowTable.getTableHeader().setReorderingAllowed(false);
 		scrollpane.setRowHeaderView(rowTable);
 		scrollpane.setCorner(JScrollPane.UPPER_LEFT_CORNER, rowTable.getTableHeader());
 		try{
@@ -127,10 +129,13 @@ public class TabelaXML extends AbstractTableModel{
 	}
 	@Override
 	public void setValueAt(Object valor, int row, int column){
-		rowSection = (Element) linhas.item(row);	
-		rowSection.setAttribute(getColumnName(column),(String) valor);
-		fireTableCellUpdated(row, column); //avisa o listener
-		fireTableDataChanged();
+		rowSection = (Element) linhas.item(row);
+		if(!valor.equals(rowSection.getAttribute(getColumnName(column))) ){
+			rowSection.setAttribute(getColumnName(column),(String) valor);
+			fireTableCellUpdated(row, column); //avisa o listener
+		}
+		return;
+		//fireTableDataChanged();
 	}
 	
 	public void setLarguraMaximaColuna(){
@@ -168,7 +173,7 @@ public class TabelaXML extends AbstractTableModel{
         }
 
 	}
-	// TODO: implementar validacao de campos
+	
 	public String getStatus(int rowIndex, int columnIndex){
 		if(existeLayout)
 			return validaEstrutura.valida(this.getColumnName(columnIndex),(String) getValueAt(rowIndex, columnIndex)) ;
@@ -182,7 +187,7 @@ public class TabelaXML extends AbstractTableModel{
 	public void stopTableValidation(){
 		for(int i=0;i<table.getColumnCount();i++)
 			table.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer());
-		fireTableDataChanged();
+		fireTableDataChanged();	
 	}	
 	
 	public void validate() {}

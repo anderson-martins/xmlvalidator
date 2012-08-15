@@ -76,7 +76,7 @@ public class JanelaPrincipal extends JFrame {
 	
 	public  void createWindow(){
 		try{
-			System.out.println(MacAddress.getMacAddsess());				
+			//System.out.println(MacAddress.getMacAddsess());				
 		}catch (Exception e) {
 			System.out.println("Não foi possível ler o MAC ADDRESS: " + e.getMessage());
 		}
@@ -107,6 +107,14 @@ public class JanelaPrincipal extends JFrame {
 		JMenuItem menuArquivoSalvar = new JMenuItem("Salvar");
 		menuArquivoSalvar.addActionListener(new SaveAction());
 		
+		JMenu menuArquivoLayout = new JMenu("Layout");
+		JMenuItem menuArquivoLayoutTabela = new JMenuItem("Tabela");
+		JMenuItem menuArquivoLayoutCampos = new JMenuItem("Campos");
+		JMenuItem menuArquivoLayoutValidacao = new JMenuItem("Validação");
+		menuArquivoLayout.add(menuArquivoLayoutTabela);
+		menuArquivoLayout.add(menuArquivoLayoutCampos);
+		menuArquivoLayout.add(menuArquivoLayoutValidacao);
+		
 		JMenuItem menuArquivoSair = new JMenuItem("Sair");
 		menuArquivoSair.addActionListener(new AbstractAction() {
 			
@@ -120,6 +128,7 @@ public class JanelaPrincipal extends JFrame {
 		menuArquivo.add(menuArquivoNovo);
 		menuArquivo.add(menuArquivoAbrir);
 		menuArquivo.add(menuArquivoSalvar);
+		menuArquivo.add(menuArquivoLayout);
 		menuArquivo.addSeparator();
 		menuArquivo.add(menuArquivoSair);
 		menuArquivo.setMnemonic('A');
@@ -356,23 +365,19 @@ public class JanelaPrincipal extends JFrame {
 
 		@Override
 		public void tableChanged(TableModelEvent ev) {
-			if (!alterado){				
-				
-				abas.setTitleAt(abas.getSelectedIndex(), "*"+abas.getTitleAt(abas.getSelectedIndex()));
-				alterado = true;
-			}
 			
+			if(ev.getLastRow() != 2147483647 && !abas.getTitleAt(abas.getSelectedIndex()).contains("*"))				
+				abas.setTitleAt(abas.getSelectedIndex(), "*"+abas.getTitleAt(abas.getSelectedIndex()));		
 		}
 				
 	}
 	class SaveAction extends AbstractAction{
 		public void actionPerformed(ActionEvent e){
 			
-			if(alterado){
-				abas.setTitleAt(abas.getSelectedIndex(), abas.getTitleAt(abas.getSelectedIndex()).replace("*", ""));
+				abas.setTitleAt(abas.getSelectedIndex(), abas.getTitleAt(abas.getSelectedIndex()).replaceAll("\\*?", "")); //substitui todos os * por nada
 				alterado = false;
-			}
-			TabelaXML t = hTabelas.get(abas.getTitleAt(abas.getSelectedIndex()));
+				
+			TabelaXML t = hTabelas.get(abas.getTitleAt(abas.getSelectedIndex()).replaceAll("\\*?", ""));
 			
 			try{
 				DOMSource source = new DOMSource(t.getDocument());
@@ -391,25 +396,13 @@ public class JanelaPrincipal extends JFrame {
 		}
 	}
 	class ValidateAction extends AbstractAction{
-		public void actionPerformed(ActionEvent e){
-			boolean flag = false;
-			if(abas.getTitleAt(abas.getSelectedIndex()).contains("*"))
-				flag = true;
-			hTabelas.get(abas.getTitleAt(abas.getSelectedIndex()).replace("*", "")).fireTableValidation();
-			if(!flag)
-				abas.setTitleAt(abas.getSelectedIndex(), abas.getTitleAt(abas.getSelectedIndex()).replace("*", ""));
-			alterado = false;
+		public void actionPerformed(ActionEvent e){			
+			hTabelas.get(abas.getTitleAt(abas.getSelectedIndex()).replaceAll("\\*?", "")).fireTableValidation();			
 		}
 	}
 	class StopValidateAction extends AbstractAction{
 		public void actionPerformed(ActionEvent e){
-			boolean flag = false;
-			if(abas.getTitleAt(abas.getSelectedIndex()).contains("*"))
-				flag = true;
-			hTabelas.get(abas.getTitleAt(abas.getSelectedIndex()).replace("*", "")).stopTableValidation();
-			if(!flag)
-				abas.setTitleAt(abas.getSelectedIndex(), abas.getTitleAt(abas.getSelectedIndex()).replace("*", ""));
-			alterado = false;
+			hTabelas.get(abas.getTitleAt(abas.getSelectedIndex()).replaceAll("\\*?", "")).stopTableValidation();
 		}
 	}
 	class RelatorioAction extends AbstractAction{
