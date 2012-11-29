@@ -10,7 +10,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -29,7 +32,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import controller.*;
-
+import model.Campos;
 
 public class TabelaXML extends AbstractTableModel{
 	/**
@@ -194,14 +197,34 @@ public class TabelaXML extends AbstractTableModel{
 		for(int i=0;i<table.getColumnCount();i++)
 			table.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer());
 		fireTableDataChanged();	
-	}	
+	}
 	
-	public void validate() {}
-	public void revalidate() {}
-	protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {}
-	public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {}
-	
-	
+	/*
+	 * Este metodo verifica os campos que estão definidos no layout APLIC mas nao estao na tabelaXML
+	 * Retorna um conjunto com os campos 
+	 * @param 
+	 */
+	public ArrayList<String> getLostFields(){
+		ArrayList<String> listCampos = new ArrayList<String>();
+		ArrayList<String> temp = new ArrayList<String>();
+		for(int i = 0; i < table.getColumnCount(); i++){
+			  listCampos.add(table.getColumnName(i));
+		}
+		
+		Hashtable<String, Campos> campos = new Hashtable<String, Campos>();
+		campos = validaEstrutura.getCampos();
+		Iterator<Map.Entry<String, Campos>> it = campos.entrySet().iterator();
+		
+		while (it.hasNext()) {
+			Map.Entry<String, Campos> entry = it.next();
+			if(!listCampos.contains(entry.getKey())){
+				temp.add(entry.getKey());
+			}
+							  
+		}		  
+		return temp;
+	}
+		
 	
 	@SuppressWarnings("serial")
 	public class StatusColumnCellRenderer extends DefaultTableCellRenderer {
@@ -256,5 +279,6 @@ public class TabelaXML extends AbstractTableModel{
          frame.setVisible(true);
          frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  }*/
+
 
 }

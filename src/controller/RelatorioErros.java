@@ -22,8 +22,9 @@ public class RelatorioErros {
 	//private Vector<Erro> vectorErros;
 	public static void relatorio(LinkedList<TabelaXML> listTabela){
 		Vector<Erro> vectorErros = new Vector<Erro>();
-		
+		//percorre listTabelas
 		for(int k=0;k < listTabela.size();k++){
+			//percorre todas as celulas da tabela e valida uma a uma
 			for(int i=0; i < listTabela.get(k).getColumnCount(); i++){
 				for(int j=0; j < listTabela.get(k).getRowCount(); j++){
 					if(listTabela.get(k).getStatus(j, i) != ValidacaoEstrutural.APPROVED){
@@ -33,6 +34,12 @@ public class RelatorioErros {
 								listTabela.get(k).getColumnName(i)));
 					}
 				}
+			}
+			for(String lostField : listTabela.get(k).getLostFields()){
+				vectorErros.add(new Erro("#", 
+						"O campo "+lostField+" não existe no arquivo XML (Layout fora do padrão)",
+						listTabela.get(k).getArquivo().getName(),
+						"#"));
 			}
 		}
 		

@@ -21,7 +21,7 @@ public class ValidacaoEstrutural {
 	private Hashtable<String, Campos> campos;
 	
 	public ValidacaoEstrutural(String nomeTabela){
-		this.nomeTabela = nomeTabela.replaceAll("(?i).xml", "");
+		this.nomeTabela = nomeTabela.toUpperCase().replaceAll("(?i).xml", "");
 		daoTabela = new DaoTabela();
 		tabela = daoTabela.buscar(this.nomeTabela.toUpperCase());
 		daoCampos = new DaoCampos();
@@ -42,10 +42,10 @@ public class ValidacaoEstrutural {
 				
 		return APPROVED;
 	}
-	public String validaVinculo(String columnName, String value){
+	/*public String validaVinculo(String columnName, String value){
 		
 		return APPROVED;
-	}
+	}*/
 	public Hashtable<String, String> buscaVinculados(){
 		Hashtable<String, String> temp = new Hashtable<String, String>();
 		Iterator<Map.Entry<String, Campos>> it = campos.entrySet().iterator();
@@ -60,6 +60,23 @@ public class ValidacaoEstrutural {
 		}
 		return temp;
 	}
+	
+	
+	/*Retorna uma lista com os campos do model "Tabela" 
+	 * */
+	public Hashtable<String, Campos> getCampos(){
+		
+		return campos;
+		/*ArrayList<String> listCampos = new ArrayList<String>();
+		
+		Iterator<Map.Entry<String, Campos>> it = campos.entrySet().iterator();
 
+		while (it.hasNext()) {
+		  Map.Entry<String, Campos> entry = it.next();
 
+		  listCampos.add(campos.get(entry.getKey()).getNome());
+		}
+		return listCampos;
+	}*/
+	}
 }

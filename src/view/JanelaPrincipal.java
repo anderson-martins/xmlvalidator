@@ -257,7 +257,7 @@ public class JanelaPrincipal extends JFrame {
 		propriedades = new JScrollPane(fileTree,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);			
 		propriedades.setMinimumSize(new Dimension(content.getWidth()/PROPORCAO_TELA,content.getHeight()/PROPORCAO_TELA));
 		
-		// areadas talbelas		
+		// area das talbelas		
 		abas = new JTabbedPane(JTabbedPane.TOP);
 		abas.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);		
 		
@@ -288,6 +288,7 @@ public class JanelaPrincipal extends JFrame {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		//cria uma Thread para abrir janelas, isso impede um dead lock
 		SwingUtilities.invokeLater(new Runnable(){
 			public void run(){
 				new JanelaPrincipal().createWindow();
