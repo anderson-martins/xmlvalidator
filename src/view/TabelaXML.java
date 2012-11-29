@@ -10,7 +10,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -20,7 +23,6 @@ import org.xml.sax.InputSource;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
@@ -30,7 +32,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import controller.*;
-
+import model.Campos;
 
 public class TabelaXML extends AbstractTableModel{
 	/**
@@ -49,7 +51,9 @@ public class TabelaXML extends AbstractTableModel{
 	private ValidacaoEstrutural validaEstrutura;
 	private boolean existeLayout;
 
-	
+	public TabelaXML(File arquivoXML) throws IOException, ParserConfigurationException, org.xml.sax.SAXException{
+		this(arquivoXML.getAbsolutePath());
+	}
 	public TabelaXML(String documentoXml) throws IOException, ParserConfigurationException, org.xml.sax.SAXException{
 		this.arquivoTabela = new File(documentoXml);
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -80,7 +84,7 @@ public class TabelaXML extends AbstractTableModel{
 			validaEstrutura = new ValidacaoEstrutural(arquivoTabela.getName());
 			existeLayout = true;
 		}catch(NullPointerException npe){
-			System.err.println("erro ao encontrar layout");		
+			System.err.println("erro ao encontrar layout");
 			existeLayout = false;
 		}
 		
@@ -100,6 +104,11 @@ public class TabelaXML extends AbstractTableModel{
 	}
 	public Document getDocument(){
 		return this.tabela;
+	}
+	public Hashtable<String, String> getCamposVinculados(){
+		if(existeLayout)
+			return validaEstrutura.buscaVinculados();
+		return null;
 	}
 	
 	//metodos necessários para montagem da tabela, usados internamente quando usado o metodo JTabel.seTModel()
@@ -188,14 +197,34 @@ public class TabelaXML extends AbstractTableModel{
 		for(int i=0;i<table.getColumnCount();i++)
 			table.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer());
 		fireTableDataChanged();	
-	}	
+	}
 	
-	public void validate() {}
-	public void revalidate() {}
-	protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {}
-	public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {}
-	
-	
+	/*
+	 * Este metodo verifica os campos que estão definidos no layout APLIC mas nao estao na tabelaXML
+	 * Retorna um conjunto com os campos 
+	 * @param 
+	 */
+	public ArrayList<String> getLostFields(){
+		ArrayList<String> listCampos = new ArrayList<String>();
+		ArrayList<String> temp = new ArrayList<String>();
+		for(int i = 0; i < table.getColumnCount(); i++){
+			  listCampos.add(table.getColumnName(i));
+		}
+		
+		Hashtable<String, Campos> campos = new Hashtable<String, Campos>();
+		campos = validaEstrutura.getCampos();
+		Iterator<Map.Entry<String, Campos>> it = campos.entrySet().iterator();
+		
+		while (it.hasNext()) {
+			Map.Entry<String, Campos> entry = it.next();
+			if(!listCampos.contains(entry.getKey())){
+				temp.add(entry.getKey());
+			}
+							  
+		}		  
+		return temp;
+	}
+		
 	
 	@SuppressWarnings("serial")
 	public class StatusColumnCellRenderer extends DefaultTableCellRenderer {
@@ -206,14 +235,17 @@ public class TabelaXML extends AbstractTableModel{
 		    JLabel l = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
 		    //status da linha atual.
 		    TabelaXML tableModel = (TabelaXML) table.getModel();
-		    if(isSelected && tableModel.getStatus(row, col) == ValidacaoEstrutural.APPROVED){
+		    String status = tableModel.getStatus(row, col);
+		    if(isSelected && status == ValidacaoEstrutural.APPROVED){
 		    	l.setBackground(new Color(0,100,160));
 		    }
-		    else if (tableModel.getStatus(row, col) == ValidacaoEstrutural.REJECTED) {
+		    else if (status == ValidacaoEstrutural.REJECTED) {
 		    	l.setBackground(Color.RED);
-		    }else if(tableModel.getStatus(row, col) == ValidacaoEstrutural.REJECTED_SIZE){
-		    	l.setBackground(Color.YELLOW);
-		    }else if(tableModel.getStatus(row, col) == ValidacaoEstrutural.REJECTED_NOT_EXISTS){
+		    }
+		    /*else if(status == ValidacaoEstrutural.REJECTED_SIZE){
+		    	l.setBackground(Color.YELLOW); -----------DEPRECATED------------
+		    }*/
+		    else if(status == ValidacaoEstrutural.REJECTED_NOT_EXISTS){
 		    	l.setBackground(Color.MAGENTA);
 		    }else {
 		    
@@ -247,5 +279,6 @@ public class TabelaXML extends AbstractTableModel{
          frame.setVisible(true);
          frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  }*/
+
 
 }

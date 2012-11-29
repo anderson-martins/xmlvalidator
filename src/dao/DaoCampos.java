@@ -42,14 +42,11 @@ public class DaoCampos {
 	           temp.setId_campo(rs.getInt("id_campo"));
 	           temp.setId_tabela(rs.getInt("id_tabela"));  
 	           temp.setNome(rs.getString("nome"));  
-	           temp.setChave(rs.getBoolean("chave"));  
-	           temp.setComentario(rs.getString("comentario"));
+	           temp.setChave(rs.getString("chave"));  
 	           temp.setObrigatorio(rs.getString("obrigatorio"));
 	           temp.setTabelaOrigem(rs.getString("tabela_origem"));
-	           temp.setTamanho(rs.getInt("tamanho"));
-	           temp.setTamanho_fixo(rs.getBoolean("tamanho_fixo"));
 	           temp.setTipo(rs.getString("tipo"));
-	           resultados.put(temp.getNome()+temp.getId_tabela(),temp);  
+	           resultados.put(temp.getNome().toUpperCase(),temp);  
            }  
          return resultados;  
       } catch (SQLException e) {  
@@ -61,14 +58,11 @@ public class DaoCampos {
    public void atualizar(Campos campos) {  
       conectar();  
       String com = "UPDATE campos SET nome = '" + campos.getNome()  
-            + "', tamanho =" + campos.getTamanho()  
-            + ", tamanho_fixo =" + campos.isTamanho_fixo()
-            + ", obrigatorio =" + campos.isObrigatorio()
+            + ", obrigatorio =" + campos.getObrigatorio()
             + ", id_tabela =" + campos.getId_tabela()
             + ", tabela_origem ='" + campos.getTabelaOrigem()
-            + "', chave =" + campos.isChave()
+            + "', chave =" + campos.getChave()
             + ", tipo ='" + campos.getTipo()
-            + "', comentario ='" + campos.getComentario()
             + "' WHERE  id_campo = '" + campos.getId_campo() + "';";  
       System.out.println("Atualizado id: "+campos.getId_campo());  
       try {  
@@ -93,12 +87,9 @@ public class DaoCampos {
         	temp.setId_campo(rs.getInt("id_campo"));
             temp.setId_tabela(rs.getInt("id_tabela"));  
             temp.setNome(rs.getString("nome"));  
-            temp.setChave(rs.getBoolean("chave"));  
-            temp.setComentario(rs.getString("comentario"));
+            temp.setChave(rs.getString("chave"));  
             temp.setObrigatorio(rs.getString("obrigatorio"));
             temp.setTabelaOrigem(rs.getString("tabela_origem"));
-            temp.setTamanho(rs.getInt("tamanho"));
-            temp.setTamanho_fixo(rs.getBoolean("tamanho_fixo"));
             temp.setTipo(rs.getString("tipo"));
             fechar();
             return temp;  
@@ -116,14 +107,11 @@ public class DaoCampos {
       try {  
          comando.executeUpdate("INSERT INTO campos VALUES("  
                + "null, '"+ campos.getNome() + "', "
-        		+ campos.getTamanho()+ ", "
-        		+ campos.isTamanho_fixo()+ ", "
-        		+ campos.isObrigatorio()+ ", "
+        		+ campos.getObrigatorio()+ ", "
         		+ campos.getId_tabela()+ ", '"
         		+ campos.getTabelaOrigem()+ "', "
-        		+ campos.isChave()+ ", '"
+        		+ campos.getChave()+ ", '"
         		+ campos.getTipo()+ "', '"
-        		+ campos.getComentario()+ "' "
         		+ ")");  
          System.out.println("campo "+campos.getId_campo()+" inserido!");  
       } catch (SQLException e) {  
