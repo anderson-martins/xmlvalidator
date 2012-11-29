@@ -2,18 +2,19 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Locale;
-import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -30,6 +31,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
@@ -63,7 +65,7 @@ public class JanelaPrincipal extends JFrame {
 	private Container content = getContentPane();
 	private JMenuBar menuBar = new JMenuBar();
 	private JToolBar toolBar = new JToolBar();
-	private JPanel propriedades = new JPanel();
+	private JScrollPane propriedades;
 	private URL url;
 	private JTabbedPane abas;
 	private TabelaXML tabela;
@@ -73,6 +75,8 @@ public class JanelaPrincipal extends JFrame {
 	protected Hashtable<String, TabelaXML> hTabelas;
 	JTree fileTree;
 	FileSystemModel fileSystemModel;
+	protected JButton btRelatorioErros;
+	protected JButton btRelatorioVinculacaoErros;
 	
 	public  void createWindow(){
 		try{
@@ -180,8 +184,10 @@ public class JanelaPrincipal extends JFrame {
 		btValida.addActionListener(new ValidateAction());
 		JButton btStop = new JButton(new ImageIcon(getResource("stopImage")));
 		btStop.addActionListener(new StopValidateAction());
-		JButton btRelatorioErros = new JButton(new ImageIcon(getResource("relatorioErros")));
+		btRelatorioErros = new JButton(new ImageIcon(getResource("relatorioErros")));
 		btRelatorioErros.addActionListener(new RelatorioAction());
+		btRelatorioVinculacaoErros = new JButton(new ImageIcon(getResource("relatorioVinculos")));
+		btRelatorioVinculacaoErros.addActionListener(new RelatorioAction());
 		
 		toolBar.add(newFile);
 		toolBar.add(openFile);
@@ -191,7 +197,7 @@ public class JanelaPrincipal extends JFrame {
 		toolBar.add(btStop);
 		toolBar.addSeparator();// -----
 		toolBar.add(btRelatorioErros);
-		
+		toolBar.add(btRelatorioVinculacaoErros);
 		
 		
 		//status
@@ -200,7 +206,7 @@ public class JanelaPrincipal extends JFrame {
 		statusBar.setHorizontalAlignment(JLabel.LEADING);
 
 		// JPanel propriedades
-		propriedades.setMinimumSize(new Dimension(content.getWidth()/PROPORCAO_TELA,content.getHeight()/PROPORCAO_TELA));
+		
 		fileSystemModel = new FileSystemModel(new File("c:\\aplic"));
 		fileTree = new JTree(fileSystemModel);
 		fileTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -208,21 +214,52 @@ public class JanelaPrincipal extends JFrame {
 		
 		      public void mouseClicked(MouseEvent event) {
 		        File file = (File) fileTree.getLastSelectedPathComponent();
-		        if (file.getName().toLowerCase().endsWith("xml") && event.getClickCount() == 2)
-		        	abreAbaXML(file);
+		        if (file != null){
+			        if (file.getName().toLowerCase().endsWith("xml")){
+			        	if( event.getClickCount() == 2)
+			        	abreAbaXML(file);
+			        }
+		        }
+		        	
 		      }
 		    });
 		fileTree.setAlignmentX(LEFT_ALIGNMENT);
 		fileTree.setBackground(new Color(215,215,225));
-		propriedades.add(fileTree);			
+		//fileTree.setCellRenderer(new TreeRenderer()); 
 		
+		/* Key listener ao teclar enter o filetree abre a tabela XML */
+		fileTree.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+				
+				if(arg0.getKeyChar() == KeyEvent.VK_ENTER){
+					File file = (File) fileTree.getLastSelectedPathComponent();
+			        if (file.getName().toLowerCase().endsWith("xml"))
+			        	abreAbaXML(file);
+				}
+				
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				
+				
+			}
+		});
+
+		propriedades = new JScrollPane(fileTree,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);			
+		propriedades.setMinimumSize(new Dimension(content.getWidth()/PROPORCAO_TELA,content.getHeight()/PROPORCAO_TELA));
 		
 		// areadas talbelas		
 		abas = new JTabbedPane(JTabbedPane.TOP);
-		abas.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-		
-		
-		
+		abas.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);		
 		
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, propriedades, abas);
 		splitPane.setOneTouchExpandable(true);
@@ -260,6 +297,7 @@ public class JanelaPrincipal extends JFrame {
 		for(UIManager.LookAndFeelInfo look : looks){
 			System.out.println(look.getClassName());
 		}*/
+		//RelatorioErros.listDirectoryAppend(new File("c:/aplic"), new LinkedList<File>());
 		
 
 	}
@@ -365,7 +403,7 @@ public class JanelaPrincipal extends JFrame {
 
 		@Override
 		public void tableChanged(TableModelEvent ev) {
-			
+			// o metodo getLastRow retorna 2147483647 qndo indica possível mudança em toda tabela equivale a capacidade do int 2³¹
 			if(ev.getLastRow() != 2147483647 && !abas.getTitleAt(abas.getSelectedIndex()).contains("*"))				
 				abas.setTitleAt(abas.getSelectedIndex(), "*"+abas.getTitleAt(abas.getSelectedIndex()));		
 		}
@@ -396,19 +434,28 @@ public class JanelaPrincipal extends JFrame {
 		}
 	}
 	class ValidateAction extends AbstractAction{
-		public void actionPerformed(ActionEvent e){			
-			hTabelas.get(abas.getTitleAt(abas.getSelectedIndex()).replaceAll("\\*?", "")).fireTableValidation();			
+		public void actionPerformed(ActionEvent e){	
+			try{
+				hTabelas.get(abas.getTitleAt(abas.getSelectedIndex()).replaceAll("\\*?", "")).fireTableValidation();
+			}catch (ArrayIndexOutOfBoundsException ex) {
+				System.err.println("não existe aba selecionada");
+			}
+			
 		}
 	}
 	class StopValidateAction extends AbstractAction{
 		public void actionPerformed(ActionEvent e){
-			hTabelas.get(abas.getTitleAt(abas.getSelectedIndex()).replaceAll("\\*?", "")).stopTableValidation();
+			try{
+				hTabelas.get(abas.getTitleAt(abas.getSelectedIndex()).replaceAll("\\*?", "")).stopTableValidation();
+			}catch (ArrayIndexOutOfBoundsException ex) {
+				System.err.println("não existe aba selecionada");
+			}
 		}
 	}
 	class RelatorioAction extends AbstractAction{
 		
 		public void actionPerformed(ActionEvent e){	
-			
+			content.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			LinkedList<TabelaXML> listTabelaXML = new LinkedList<TabelaXML>();
 			File diretorio = new File("c:/aplic");
 			File arquivos[] = diretorio.listFiles();
@@ -422,7 +469,11 @@ public class JanelaPrincipal extends JFrame {
 					}
 				}
 			}
-			RelatorioErros.relatorio(listTabelaXML);
+			if(e.getSource() == btRelatorioErros)
+				RelatorioErros.relatorio(listTabelaXML);
+			else if(e.getSource() == btRelatorioVinculacaoErros)
+				RelatorioErros.relatorioVinculo(listTabelaXML);		
+			content.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		}
 	}
 }
