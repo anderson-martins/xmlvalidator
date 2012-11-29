@@ -47,17 +47,14 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import view.TabelaXML;
+import view.Preferencias;
 
 import controller.MacAddress;
 import controller.RelatorioErros;
 
-
-
-
-
 @SuppressWarnings("serial")
 public class JanelaPrincipal extends JFrame {
-	private static ResourceBundle resources;
+	private static ResourceBundle resources; 
 	
 	//gui components
 	private Container content = getContentPane();
@@ -74,11 +71,12 @@ public class JanelaPrincipal extends JFrame {
 	JTree fileTree;
 	FileSystemModel fileSystemModel;
 	
+	
 	public  void createWindow(){
 		try{
 			//System.out.println(MacAddress.getMacAddsess());				
 		}catch (Exception e) {
-			System.out.println("Não foi possível ler o MAC ADDRESS: " + e.getMessage());
+			System.out.println("Nï¿½o foi possï¿½vel ler o MAC ADDRESS: " + e.getMessage());
 		}
 		
 		hTabelas = new Hashtable<String, TabelaXML>();
@@ -87,6 +85,7 @@ public class JanelaPrincipal extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		setJMenuBar(menuBar);
+		
 		
 		//Resources
 		try {
@@ -110,7 +109,7 @@ public class JanelaPrincipal extends JFrame {
 		JMenu menuArquivoLayout = new JMenu("Layout");
 		JMenuItem menuArquivoLayoutTabela = new JMenuItem("Tabela");
 		JMenuItem menuArquivoLayoutCampos = new JMenuItem("Campos");
-		JMenuItem menuArquivoLayoutValidacao = new JMenuItem("Validação");
+		JMenuItem menuArquivoLayoutValidacao = new JMenuItem("Validaï¿½ï¿½o");
 		menuArquivoLayout.add(menuArquivoLayoutTabela);
 		menuArquivoLayout.add(menuArquivoLayoutCampos);
 		menuArquivoLayout.add(menuArquivoLayoutValidacao);
@@ -124,6 +123,7 @@ public class JanelaPrincipal extends JFrame {
 				
 			}
 		});
+		
 		
 		menuArquivo.add(menuArquivoNovo);
 		menuArquivo.add(menuArquivoAbrir);
@@ -140,11 +140,23 @@ public class JanelaPrincipal extends JFrame {
 		JMenuItem menuEditarCopiar = new JMenuItem("Copiar");
 		JMenuItem menuEditarColar = new JMenuItem("Colar");
 		JMenuItem menuEditarLocalizar = new JMenuItem("Localizar");
+		JMenuItem menuEditarPreferencias = new JMenuItem("PreferÃªncias");
+		
+		// actions for Edit Menu::
+		menuEditarPreferencias.addActionListener(new OpenPreferencias());
+		
+		// add itens
+		
 		menuEditar.add(menuEditarCopiar);
 		menuEditar.add(menuEditarColar);
 		menuEditar.add(menuEditarLocalizar);
+		menuEditar.addSeparator();
+		menuEditar.add(menuEditarPreferencias);
+		
 		menuEditar.setMnemonic('E');
 		menuBar.add(menuEditar);
+		
+		
 		
 		//validar
 		
@@ -195,7 +207,7 @@ public class JanelaPrincipal extends JFrame {
 		
 		
 		//status
-		JLabel statusBar = new JLabel("Validação de arquivos XML");
+		JLabel statusBar = new JLabel("Validaï¿½ï¿½o de arquivos XML");
 		statusBar.setBorder(new EmptyBorder(4,4,4,4));
 		statusBar.setHorizontalAlignment(JLabel.LEADING);
 
@@ -303,7 +315,7 @@ public class JanelaPrincipal extends JFrame {
 
 	        public void actionPerformed(ActionEvent e) {
 		    
-	            JFileChooser chooser = new JFileChooser("c:/aplic"); //se nao abrir nesse diretorio abrirá no default
+	            JFileChooser chooser = new JFileChooser("c:/aplic"); //se nao abrir nesse diretorio abrirï¿½ no default
 	            chooser.addChoosableFileFilter(extensionFilter);
 	            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	            chooser.setFileFilter(extensionFilter);
@@ -319,12 +331,14 @@ public class JanelaPrincipal extends JFrame {
 	            abreAbaXML(f);
 	        }
 	    }
+	
+	
 	public void abreAbaXML(File f){
 		if (f.isFile() && f.canRead() && f.getName().toLowerCase().endsWith("xml")) {
 	    	if(hTabelas.get(f.getName()) != null){ 
 	    		for(int i=0; i < abas.getTabCount(); i++){
 	    			if(abas.getTitleAt(i).equals(f.getName())){
-	    				abas.setSelectedIndex(i); // se já existe na hTabelas seleciona o indice
+	    				abas.setSelectedIndex(i); // se jï¿½ existe na hTabelas seleciona o indice
 	    				return;
 	    			}
 	    		}
@@ -353,7 +367,7 @@ public class JanelaPrincipal extends JFrame {
 		
 	    } else {
                 JOptionPane.showMessageDialog(getContentPane(),
-                        "Não foi possível abrir a tabela XML ou não é um documento válido: " + f,
+                        "Nï¿½o foi possï¿½vel abrir a tabela XML ou nï¿½o ï¿½ um documento vï¿½lido: " + f,
                         "Erro ao abrir arquivo",
                         JOptionPane.ERROR_MESSAGE);
 	    
@@ -387,7 +401,7 @@ public class JanelaPrincipal extends JFrame {
 				transformer.transform(source, result);			
 			}catch (Exception ex) {
 				JOptionPane.showMessageDialog(getContentPane(),
-                        "Não foi possível salvar a tabela XML: "+t.getArquivo(),
+                        "Nï¿½o foi possï¿½vel salvar a tabela XML: "+t.getArquivo(),
                         "Erro ao abrir arquivo",
                         JOptionPane.ERROR_MESSAGE);
 			
@@ -418,11 +432,20 @@ public class JanelaPrincipal extends JFrame {
 					try{
 						listTabelaXML.add(new TabelaXML(arquivo.getAbsolutePath()));
 					}catch (Exception ex) {
-						System.out.println("erro ao gerar relatório");
+						System.out.println("erro ao gerar relatï¿½rio");
 					}
 				}
 			}
 			RelatorioErros.relatorio(listTabelaXML);
 		}
 	}
+	
+	class OpenPreferencias extends AbstractAction{
+		public void actionPerformed(ActionEvent e){
+			
+			Preferencias.Open();
+			
+		}
+	}
+	
 }

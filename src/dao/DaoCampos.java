@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;  
 import java.sql.Statement;  
 import java.util.Hashtable;
- 
+import view.helper;
   
 import javax.swing.JOptionPane;  
   
@@ -25,7 +25,7 @@ public class DaoCampos {
                .executeUpdate("DELETE FROM campos WHERE id_campo = '" + id  
                      + "';");  
       } catch (SQLException e) {  
-         imprimeErro("Erro ao apagar campo", e.getMessage());  
+         helper.imprimeErro("Erro ao apagar campo", e.getMessage());  
       } finally {  
          fechar();  
       }  
@@ -53,7 +53,7 @@ public class DaoCampos {
            }  
          return resultados;  
       } catch (SQLException e) {  
-         imprimeErro("Erro ao buscar campos", e.getMessage());  
+         helper.imprimeErro("Erro ao buscar campos", e.getMessage());  
          return null;  
       }  
    }  
@@ -105,7 +105,7 @@ public class DaoCampos {
          }
          return null;
       } catch (SQLException e) {  
-         imprimeErro("Erro ao buscar campo", e.getMessage());  
+         helper.imprimeErro("Erro ao buscar campo", e.getMessage());  
          return null;  
       }  
   
@@ -127,7 +127,7 @@ public class DaoCampos {
         		+ ")");  
          System.out.println("campo "+campos.getId_campo()+" inserido!");  
       } catch (SQLException e) {  
-         imprimeErro("Erro ao inserir campo", e.getMessage());  
+         helper.imprimeErro("Erro ao inserir campo", e.getMessage());  
       } finally {  
          fechar();  
       }  
@@ -148,16 +148,10 @@ public class DaoCampos {
       try {  
          comando.close();  
          con.close();  
-         //System.out.println("Conexão Fechada");  
+         //System.out.println("Conexï¿½o Fechada");  
       } catch (SQLException e) {  
-         imprimeErro("Erro ao fechar conexão", e.getMessage());  
+         helper.imprimeErro("Erro ao fechar conexï¿½o", e.getMessage());  
       }  
    }  
   
-   private void imprimeErro(String msg, String msgErro) {  
-      JOptionPane.showMessageDialog(null, msg, "Erro no banco de dados", 0);  
-      System.err.println(msg);  
-      System.out.println(msgErro);  
-      //System.exit(0);  
-   }  
 }  

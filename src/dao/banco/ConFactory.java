@@ -1,7 +1,5 @@
 package dao.banco;
 
-
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -14,7 +12,7 @@ public class ConFactory {
     private static final String IP = "localhost";   
     private static final String STR_CON = "jdbc:mysql://" + IP + ":3306/" + DATABASE;  
     private static final String USER = "root";  
-    private static final String PASSWORD = "1";  
+    private static final String PASSWORD = "123456";  
     private static Connection con = null; 
     
 public static Connection getConexao() {  
@@ -25,7 +23,7 @@ public static Connection getConexao() {
             con = DriverManager.getConnection(STR_CON, USER, PASSWORD);  
             //System.out.println("Conectado!");  
         }catch(ClassNotFoundException c){
-        	System.out.println("Classe não encontrada " + c.getMessage());
+        	System.out.println("Classe nï¿½o encontrada " + c.getMessage());
         }
         catch (SQLException e) {  
             System.out.println("Erro ao conectar ao banco de dados "+e.getMessage());
@@ -38,7 +36,7 @@ public static Connection getConexao() {
     	try{
     		con.close();    		
     	}catch(SQLException e){
-    		System.out.println("Erro ao tentar fecha conexão.");
+    		System.out.println("Erro ao tentar fecha conexï¿½o.");
     	}
     	
     }
